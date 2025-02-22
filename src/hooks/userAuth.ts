@@ -1,6 +1,6 @@
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { useEffect, useState } from 'react'
-import { auth } from '../firebase'
+import { auth } from '../lib/firebase'
 
 const useUserAuth = () => {
   const [user, setUser] = useState<User | null>(auth.currentUser) // Берём из локального кеша

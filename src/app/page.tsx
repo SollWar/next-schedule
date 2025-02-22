@@ -4,9 +4,20 @@ import userInit from '@/hooks/userInit'
 import Image from 'next/image'
 import './loading.css'
 import styles from './page.module.css'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const { user, validationResult, loginResult } = userInit()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user?.uid) {
+      setTimeout(() => {
+        router.replace('/main')
+      }, 10)
+    }
+  }, [user])
 
   return (
     <div className={styles.main}>
@@ -33,8 +44,16 @@ export default function Home() {
             Получение токена Firebase{' '}
             {loginResult == '' && user != null ? '⎵' : loginResult}
           </div>
-          <div className={user?.uid == null ? 'loading-dots' : ''}>
-            Авторизация {user?.uid ? '✓' : ''}
+          <div
+            className={
+              user?.uid == null
+                ? loginResult == 'X'
+                  ? ''
+                  : 'loading-dots'
+                : ''
+            }
+          >
+            Авторизация {user?.uid ? '✓' : loginResult == 'X' ? 'X' : ''}
           </div>
         </div>
       </div>

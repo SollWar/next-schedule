@@ -1,0 +1,116 @@
+/* ResponsiveLayout.module.css */
+
+.container {
+  display: flex;
+  position: relative;
+  height: 100vh;
+}
+
+/* Стили для бокового меню */
+.sidebar {
+  background-color: #333;
+  color: #fff;
+  width: 180px;
+  padding: 1rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* На мобильных устройствах меню по умолчанию скрыто */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: 1000;
+  }
+  /* Класс для открытого меню */
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+}
+
+/* На десктопе меню всегда видно */
+@media (min-width: 769px) {
+  .sidebar {
+    transform: translateX(0);
+    position: relative;
+  }
+}
+
+/* Оверлей для затемнения фона (виден только на мобильной версии) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* ниже, чем у меню (1000) */
+}
+
+@media (min-width: 769px) {
+  .overlay {
+    display: none;
+  }
+}
+
+/* Стили для основного контента */
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header с кнопкой для вызова меню */
+.header {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Кнопка вызова меню - скрыта на десктопе */
+.menuButton {
+  background-color: #0070f3;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+@media (min-width: 769px) {
+  .menuButton {
+    display: none;
+  }
+}
+
+/* Основной блок для контента */
+.content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Стили для содержимого меню */
+.menuContent {
+  list-style: none;
+  padding: 0;
+}
+
+.menuContent a {
+  display: block;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 3rem;
+  align-content: center;
+  background: blue;
+  margin: 0.5rem 0rem;
+}
+
+.menuContent a {
+  color: #fff;
+  text-decoration: none;
+}

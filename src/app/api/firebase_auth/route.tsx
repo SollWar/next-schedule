@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       .get()
 
     // Если его нету то разворачиваем попытку
-    if (!userDoc.exists) {
+    if (await !userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
