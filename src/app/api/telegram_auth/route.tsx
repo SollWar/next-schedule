@@ -1,6 +1,8 @@
+import { InitData } from '@/types/telegram-data'
 import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
 
+// POST на валидацию телеграм
 export async function POST(request: Request) {
   try {
     // Получение initData из запроса
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
 
     // Получение полей initData
     const jsonInitData = parseInitData(initData)
-    //console.log('Username:', jsonInitData.user.username)
+
     console.log('Telegram ID:', jsonInitData.user.id)
     const telegramID = jsonInitData.user.id
 
@@ -43,23 +45,31 @@ export async function POST(request: Request) {
 }
 
 function manualValidate(initData: string, botToken: string) {
+  // Параметры Web App
   const params = new URLSearchParams(initData)
+  // Удаление поля hash
   const hash = params.get('hash')
   params.delete('hash')
 
+  // Обработка параметров
   const dataCheckString = Array.from(params.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, v]) => `${k}=${v}`)
     .join('\n')
 
+  // Получение ключа на основе токена бота
   const secret = createHmac('sha256', 'WebAppData').update(botToken).digest()
+
+  // Получение второго ключа
   const calculatedHash = createHmac('sha256', secret)
     .update(dataCheckString)
     .digest('hex')
 
+  // Сравнение полученных ключей
   return hash === calculatedHash
 }
 
+// Функция для разбора полученной строки
 function parseInitData(queryString: string): InitData {
   const params = new URLSearchParams(queryString)
 

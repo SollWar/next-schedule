@@ -89,7 +89,7 @@
 
 /* Основной блок для контента */
 .content {
-  padding: 1rem;
+  padding: 0.1rem;
   overflow-y: auto;
   flex: 1;
 }

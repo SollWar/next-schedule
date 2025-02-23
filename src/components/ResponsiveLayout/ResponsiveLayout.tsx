@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './ResponsiveLayout.module.css'
-import Link from 'next/link'
 
 export default function ResponsiveLayout({
   children,
@@ -11,7 +10,7 @@ export default function ResponsiveLayout({
   children: React.ReactNode
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [loding, setLoading] = useState(false)
+  const [loding] = useState(false)
   const router = useRouter()
 
   const toggleMenu = () => setMenuOpen((prev) => !prev)

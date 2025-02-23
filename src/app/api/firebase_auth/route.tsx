@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import admin from 'firebase-admin'
 
+// Инициализация Firebase Admin
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -12,10 +13,10 @@ if (!admin.apps.length) {
   })
 }
 
+// POST на получение токена
 export async function POST(request: Request) {
   try {
     // Получаем UID из запроса
-    // Или любые другие данные для авторизации
     const { telegramID } = await request.json()
 
     // Если UID не получен

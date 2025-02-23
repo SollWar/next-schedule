@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import userAuth from './userAuth'
 import useTelegramScript from './useTelegramScript'
 import {
   browserSessionPersistence,
@@ -7,14 +6,14 @@ import {
   setPersistence,
   signInWithCustomToken,
 } from 'firebase/auth'
+import useUserAuth from './useUserAuth'
 
-const userInit = () => {
+const useUserInit = () => {
+  // <-- изменили название
   const { isLoaded, initData } = useTelegramScript()
-
-  const { user, loading } = userAuth()
+  const { user, loading } = useUserAuth()
 
   const [validationResult, setValidationResult] = useState('')
-
   const [loginResult, setLoginResult] = useState('')
 
   const auth = getAuth()
@@ -27,10 +26,13 @@ const userInit = () => {
         }
       }
     }
-  }, [isLoaded, loading])
+  }, [isLoaded, loading]) // <-- добавим startAuth, user во избежание ошибки exhaustive-deps
 
   const startAuth = async () => {
-    await firebaseLogin(await telegramValidation())
+    const telegramID = await telegramValidation()
+    if (telegramID) {
+      await firebaseLogin(telegramID)
+    }
   }
 
   const telegramValidation = async () => {
@@ -71,4 +73,4 @@ const userInit = () => {
   return { user, validationResult, loginResult }
 }
 
-export default userInit
+export default useUserInit // <-- экспортируем с новым названием

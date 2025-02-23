@@ -1,4 +1,4 @@
-interface TelegramUser {
+export interface TelegramUser {
   id: number
   first_name: string
   last_name: string
@@ -8,7 +8,7 @@ interface TelegramUser {
   photo_url?: string
 }
 
-interface InitData {
+export interface InitData {
   user: TelegramUser
   auth_date: number
   hash: string

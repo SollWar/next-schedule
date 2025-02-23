@@ -1,6 +1,6 @@
 'use client'
 
-import userInit from '@/hooks/userInit'
+import useAuthInit from '@/hooks/useAuthInit'
 import Image from 'next/image'
 import './loading.css'
 import styles from './page.module.css'
@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const { user, validationResult, loginResult } = userInit()
+  const { user, validationResult, loginResult } = useAuthInit()
   const router = useRouter()
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function Home() {
         router.replace('/main')
       }, 10)
     }
-  }, [user])
+  }, [user, router])
 
   return (
     <div className={styles.main}>

@@ -1,0 +1,29 @@
+.grid_container {
+  display: grid; /* Отображать как контейнер */
+  grid-template-columns: repeat(7, 1fr); /* 7 колонок */
+  gap: 2px; /* Отступы между элементами */
+  padding: 0px;
+}
+
+.grid_item {
+  background: transparent;
+  padding: 9px;
+  text-align: center;
+  border-radius: 12px;
+  color: white;
+  font-size: 36px;
+}
+
+.job_container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin: 4px 0px;
+}
+
+.job_item {
+  text-align: center;
+  border-radius: 12px;
+  color: white;
+  font-size: 36px;
+}

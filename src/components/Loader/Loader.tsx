@@ -7,7 +7,7 @@ const styles = {
     flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh',
+    height: '80vh',
   },
   spinner: {
     border: '4px solid #f3f3f3',

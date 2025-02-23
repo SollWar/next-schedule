@@ -9,7 +9,7 @@ export default function Loading() {
 const styles = {
   loadingContainer: {
     display: 'flex',
-    flexDirection: 'column' as 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',

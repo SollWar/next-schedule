@@ -1,7 +1,7 @@
 'use client'
 
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
-import userAuth from '@/hooks/userAuth'
+//import userAuth from '@/hooks/useUserAuth'
 import { Roboto } from 'next/font/google'
 import React from 'react'
 
