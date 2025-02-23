@@ -73,7 +73,6 @@ const Calendar = () => {
     <Loader isLoading={isLoading} text="Загружаем расписание...">
       {error == '' ? (
         <>
-          <p></p>
           <CalendarGrid
             jobsDataList={jobs}
             schedule={schedule}

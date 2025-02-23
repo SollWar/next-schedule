@@ -27,3 +27,12 @@
   color: white;
   font-size: 36px;
 }
+
+.grid_week_days {
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid black;
+  color: black;
+  font-size: 18px;
+  margin-bottom: 0.1rem;
+}

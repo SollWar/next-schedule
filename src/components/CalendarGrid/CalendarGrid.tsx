@@ -32,6 +32,16 @@ const CalendarGrid = ({ schedule, jobs, jobsDataList }: CalendarGridProps) => {
   return (
     <>
       <div className={styles.grid_container}>
+        <div className={styles.grid_week_days}>ПН</div>
+        <div className={styles.grid_week_days}>ВТ</div>
+        <div className={styles.grid_week_days}>СР</div>
+        <div className={styles.grid_week_days}>ЧТ</div>
+        <div className={styles.grid_week_days}>ПТ</div>
+        <div className={styles.grid_week_days}>СБ</div>
+        <div className={styles.grid_week_days}>ВС</div>
+      </div>
+
+      <div className={styles.grid_container}>
         {fakeDays.map((day, index) => (
           <div key={`fake-${index}`} className={styles.grid_item}></div>
         ))}
