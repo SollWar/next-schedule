@@ -1,0 +1,105 @@
+.main {
+  display: grid; /* Отображать как контейнер */
+  grid-template-columns: repeat(7, 1fr); /* 7 колонок */
+  gap: 0.1rem; /* Отступы между элементами */
+  width: 100%; /* Контейнер занимает всю доступную ширину */
+  max-width: 900px; /* Максимальная ширина контейнера */
+  margin: 0 auto; /* Центрирование контейнера */
+}
+
+.card {
+  aspect-ratio: 1/1;
+  align-content: center;
+  max-width: 100%; /* Ограничение по ширине */
+  max-height: 100%; /* Ограничение по высоте */
+  padding: 6px;
+  text-align: center;
+  font-size: 36px;
+  border-radius: 12px;
+  background: lightgrey;
+  transition: 0.4s ease-in-out, 0.2s background-color;
+  background: white;
+  animation: 2s loading90 infinite;
+}
+
+.card:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(4) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(6) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(8) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(10) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(12) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(14) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(16) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(18) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(20) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(22) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(24) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(26) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(28) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(30) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(32) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(34) {
+  animation-delay: 1s;
+}
+
+@keyframes loading90 {
+  0% {
+    background: white;
+  }
+
+  50% {
+    background: #4caf50;
+  }
+
+  100% {
+    background: white;
+  }
+}

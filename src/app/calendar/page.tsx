@@ -1,5 +1,4 @@
 'use client'
-import Loader from '@/components/Loader/Loader'
 import { db } from '@/lib/firebase'
 import {
   collection,
@@ -11,13 +10,13 @@ import {
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 //import styles from './page.module.css'
-import { FirebaseError } from 'firebase/app'
+//import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
 
 const Calendar = () => {
   const [schedule, setSchedule] = useState<string>('')
-  const [error, setError] = useState<string>('')
+  //const [error, setError] = useState<string>('')
   const [jobs, setJobs] = useState<JobsData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState<UserData>()
@@ -51,7 +50,8 @@ const Calendar = () => {
       // const februaryDays = usersList[0]?.schedule['2025']?.['Февраль']
       // setSchedule(februaryDays)
     } catch (error) {
-      setError((error as FirebaseError).message)
+      console.log(error)
+      //setError((error as FirebaseError).message)
     }
   }
 
@@ -67,26 +67,20 @@ const Calendar = () => {
 
       setJobs(jobsList)
     } catch (error) {
-      setError((error as FirebaseError).message)
+      console.log(error)
+      //setError((error as FirebaseError).message)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Loader isLoading={isLoading} text="Загружаем расписание...">
-      {error == '' ? (
-        <>
-          <CalendarGrid
-            jobsDataList={jobs}
-            schedule={schedule}
-            jobs={[...new Set(userData?.schedule[year]?.[month].split(','))]}
-          />
-        </>
-      ) : (
-        error
-      )}
-    </Loader>
+    <CalendarGrid
+      jobsDataList={jobs}
+      schedule={schedule}
+      jobs={[...new Set(userData?.schedule[year]?.[month].split(','))]}
+      isLoading={isLoading}
+    />
   )
 }
 

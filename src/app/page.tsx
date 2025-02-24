@@ -2,7 +2,6 @@
 
 import useAuthInit from '@/hooks/useAuthInit'
 import Image from 'next/image'
-import './loading.css'
 import styles from './page.module.css'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'

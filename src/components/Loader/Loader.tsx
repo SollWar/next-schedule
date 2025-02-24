@@ -1,40 +1,28 @@
 // components/Loader.tsx
 import React from 'react'
 
-const styles = {
-  loadingContainer: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80vh',
-  },
-  spinner: {
-    border: '4px solid #f3f3f3',
-    borderTop: '4px solid #3498db',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
-    animation: 'spin 1s linear infinite',
-  },
-  '@keyframes spin': {
-    '0%': { transform: 'rotate(0deg)' },
-    '100%': { transform: 'rotate(360deg)' },
-  },
-}
+import styles from './Loader.module.css'
 
 interface LoaderProps {
   isLoading: boolean
   children: React.ReactNode
-  text?: string
+  days: number
+  fakeDays: number
 }
 
-const Loader = ({ isLoading, children, text = 'Загрузка...' }: LoaderProps) => {
+const Loader = ({ isLoading, children, days, fakeDays }: LoaderProps) => {
+  const loaders = new Array(days).fill(0)
+
+  const fakeDaysL = new Array(fakeDays).fill(0)
   if (isLoading) {
     return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.spinner}></div>
-        <p>{text}</p>
+      <div className={styles.main}>
+        {fakeDaysL.map((_, index) => (
+          <div key={`fake_loader_${index}`}></div>
+        ))}
+        {loaders.map((_, index) => (
+          <div key={`loader_${index}`} className={styles.card}></div>
+        ))}
       </div>
     )
   }
