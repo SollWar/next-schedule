@@ -2,12 +2,20 @@
   display: grid; /* Отображать как контейнер */
   grid-template-columns: repeat(7, 1fr); /* 7 колонок */
   gap: 0.1rem; /* Отступы между элементами */
-  padding: 0px;
+  width: 100%; /* Контейнер занимает всю доступную ширину */
+  max-width: 900px; /* Максимальная ширина контейнера */
+  margin: 0 auto; /* Центрирование контейнера */
 }
 
 .grid_item {
   background: transparent;
-  padding: 0.39rem;
+  aspect-ratio: 1/1;
+  align-content: center;
+  text-align: center;
+  max-width: 100%; /* Ограничение по ширине */
+  max-height: 100%; /* Ограничение по высоте */
+
+  padding: 6px;
   text-align: center;
   border-radius: 12px;
   color: white;
@@ -18,21 +26,23 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.1rem;
-  margin: 4px 0px;
+
+  width: 100%; /* Контейнер занимает всю доступную ширину */
+  max-width: 900px; /* Максимальная ширина контейнера */
+  margin: 4px auto; /* Центрирование контейнера */
 }
 
 .job_item {
   text-align: center;
   border-radius: 12px;
   color: white;
-  font-size: 36px;
+  font-size: 32px;
 }
 
 .grid_week_days {
   text-align: center;
   border-radius: 6px;
-  border: 1px solid black;
-  color: black;
-  font-size: 18px;
+  background: white;
+  font-size: 20px;
   margin-bottom: 0.1rem;
 }

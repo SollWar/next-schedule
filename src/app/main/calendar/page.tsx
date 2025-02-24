@@ -25,7 +25,7 @@ const Calendar = () => {
   useEffect(() => {
     handleUserData('6376611308')
     getJobsName('6376611308')
-  })
+  }, [])
 
   const handleUserData = async (userId: string) => {
     try {

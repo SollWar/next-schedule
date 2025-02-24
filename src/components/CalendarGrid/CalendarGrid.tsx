@@ -17,14 +17,14 @@ const CalendarGrid = ({ schedule, jobs, jobsDataList }: CalendarGridProps) => {
 
   const firstColor = '#4CAF50'
   const secondColor = '#ff5252'
-  const weekendColor = '#3f3030'
+  const weekendColor = '#FFFFFF'
 
   const jobCount = new Array(days.length).fill(0)
 
   days.map((job) => {
     if (job == jobs[0]) {
       jobCount[0]++
-    } else {
+    } else if (job == jobs[1]) {
       jobCount[1]++
     }
   })
@@ -50,6 +50,7 @@ const CalendarGrid = ({ schedule, jobs, jobsDataList }: CalendarGridProps) => {
             className={styles.grid_item}
             key={`day-${index}`}
             style={{
+              color: day != jobs[0] && day != jobs[1] ? 'black' : '',
               backgroundColor:
                 day === jobs[0]
                   ? firstColor
