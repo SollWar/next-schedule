@@ -13,6 +13,7 @@ export interface UserData {
 
 export interface JobsData {
   job_name: string
+  job_color: string
   users: string[]
   users_rules: string[]
 }

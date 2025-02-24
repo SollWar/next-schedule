@@ -22,6 +22,9 @@ const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState<UserData>()
 
+  const year = '2025'
+  const month = 'Февраль'
+
   useEffect(() => {
     handleUserData('6376611308')
     getJobsName('6376611308')
@@ -31,11 +34,12 @@ const Calendar = () => {
     try {
       const userDocRef = doc(db, 'users', userId)
       const docSnapshot = await getDoc(userDocRef)
+
       if (!docSnapshot.exists()) {
         throw new Error('Документ не найден')
       }
       const userData = docSnapshot.data() as UserData
-      const februaryDays = userData.schedule['2025']?.['Февраль']
+      const februaryDays = userData.schedule[year]?.[month]
 
       setUserData(userData)
       setSchedule(februaryDays)
@@ -76,7 +80,7 @@ const Calendar = () => {
           <CalendarGrid
             jobsDataList={jobs}
             schedule={schedule}
-            jobs={userData?.jobs ?? ['', '']}
+            jobs={[...new Set(userData?.schedule[year]?.[month].split(','))]}
           />
         </>
       ) : (

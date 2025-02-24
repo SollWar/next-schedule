@@ -21,7 +21,7 @@ export default function ResponsiveLayout({
             }}
           >
             <button className={styles.menuButton}>Меню</button>
-            <button className={styles.menuButton}>Климовск</button>
+            <button className={styles.menuButton}>Никита</button>
           </div>
           <div
             style={{

@@ -14,7 +14,7 @@ export default function Home() {
   useEffect(() => {
     if (user?.uid) {
       setTimeout(() => {
-        router.replace('/main')
+        router.replace('/calendar')
       }, 10)
     }
   }, [user, router])

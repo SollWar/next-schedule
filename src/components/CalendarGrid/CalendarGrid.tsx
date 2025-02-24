@@ -1,6 +1,7 @@
 import { getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import styles from './CalendarGrid.module.css'
 import { JobsData } from '@/types/firestore-data'
+import { getContrastTextColor } from '@/utils/colorsUtils'
 
 interface CalendarGridProps {
   schedule: string
@@ -11,52 +12,55 @@ interface CalendarGridProps {
 const CalendarGrid = ({ schedule, jobs, jobsDataList }: CalendarGridProps) => {
   // Преобразуем строку в массив элементов
   const days = schedule.split(',')
-  const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 2)
+  const onlyJobs = jobs.filter((item) => item !== '0')
+  const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   // Пустые дни
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
 
-  const firstColor = '#4CAF50'
-  const secondColor = '#ff5252'
-  const weekendColor = '#FFFFFF'
+  const jobsColor = ['#FFFFFF']
 
   const jobCount = new Array(days.length).fill(0)
 
-  days.map((job) => {
-    if (job == jobs[0]) {
-      jobCount[0]++
-    } else if (job == jobs[1]) {
-      jobCount[1]++
-    }
+  const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
+
+  jobsDataList.map((job) => {
+    jobsColor.push(job.job_color)
+  })
+
+  days.map((day) => {
+    onlyJobs.map((job, index) => {
+      if (day == job) {
+        jobCount[index]++
+      }
+    })
   })
 
   return (
     <>
       <div className={styles.grid_container}>
-        <div className={styles.grid_week_days}>ПН</div>
-        <div className={styles.grid_week_days}>ВТ</div>
-        <div className={styles.grid_week_days}>СР</div>
-        <div className={styles.grid_week_days}>ЧТ</div>
-        <div className={styles.grid_week_days}>ПТ</div>
-        <div className={styles.grid_week_days}>СБ</div>
-        <div className={styles.grid_week_days}>ВС</div>
+        {weekDays.map((day, index) => (
+          <div key={index} className={styles.grid_week_days}>
+            {day}
+          </div>
+        ))}
       </div>
 
       <div className={styles.grid_container}>
-        {fakeDays.map((day, index) => (
+        {fakeDays.map((_, index) => (
           <div key={`fake-${index}`} className={styles.grid_item}></div>
         ))}
         {days.map((day, index) => (
           <a
+            onClick={() => {}}
             className={styles.grid_item}
             key={`day-${index}`}
             style={{
-              color: day != jobs[0] && day != jobs[1] ? 'black' : '',
-              backgroundColor:
-                day === jobs[0]
-                  ? firstColor
-                  : day === jobs[1]
-                  ? secondColor
-                  : weekendColor,
+              cursor: 'pointer',
+              color:
+                day == '0'
+                  ? 'black'
+                  : getContrastTextColor(jobsColor[Number(day)]),
+              backgroundColor: jobsColor[Number(day)],
             }}
           >
             {index + 1}
@@ -69,14 +73,22 @@ const CalendarGrid = ({ schedule, jobs, jobsDataList }: CalendarGridProps) => {
             key={job.job_name}
             className={styles.job_item}
             style={{
-              backgroundColor: index === 0 ? firstColor : secondColor,
+              color: getContrastTextColor(jobsColor[Number(index + 1)]),
+              backgroundColor: jobsColor[index + 1],
             }}
           >
             {job.job_name}
             <div
               style={{ height: '1px', width: '100%', backgroundColor: 'black' }}
             ></div>
-            <div className={styles.job_item}>{jobCount[index]}</div>
+            <div
+              style={{
+                color: getContrastTextColor(jobsColor[Number(index + 1)]),
+              }}
+              className={styles.job_item}
+            >
+              {jobCount[index]}
+            </div>
           </div>
         ))}
       </div>

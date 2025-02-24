@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import useTelegramScript from './useTelegramScript'
 import {
-  browserSessionPersistence,
+  //browserSessionPersistence,
   getAuth,
-  setPersistence,
+  //setPersistence,
   signInWithCustomToken,
 } from 'firebase/auth'
 import useUserAuth from './useUserAuth'
@@ -64,7 +64,7 @@ const useUserInit = () => {
       setLoginResult(customToken ? '✓' : 'X')
 
       if (customToken) {
-        await setPersistence(auth, browserSessionPersistence)
+        //await setPersistence(auth, browserSessionPersistence)
         await signInWithCustomToken(auth, customToken)
       }
     }
