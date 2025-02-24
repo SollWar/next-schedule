@@ -4,14 +4,12 @@
   height: 100vh;
 }
 
-/* Стили для основного контента */
 .mainContent {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Header с кнопкой для вызова меню */
 .header {
   display: flex;
   align-items: center;
@@ -21,7 +19,6 @@
   border-bottom: 1px solid #ddd;
 }
 
-/* Кнопка вызова меню - скрыта на десктопе */
 .menuButton {
   background-color: #0070f3;
   color: #fff;
@@ -34,7 +31,6 @@
   cursor: pointer;
 }
 
-/* Основной блок для контента */
 .content {
   padding: 0.1rem;
   overflow-y: auto;
