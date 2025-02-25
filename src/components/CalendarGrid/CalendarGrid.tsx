@@ -5,6 +5,7 @@ import { JobsData } from '@/types/firestore-data'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import Loader from '../Loader/Loader'
 import { useEffect, useState } from 'react'
+import DropDown from '../DropDown/DropDown'
 //import { useState } from 'react'
 
 interface CalendarGridProps {
@@ -12,6 +13,7 @@ interface CalendarGridProps {
   entityIds: string[]
   entityNames: string[]
   entityColors: string[]
+  onButtonClick: (message: string) => void
 }
 
 const CalendarGrid = ({
@@ -19,8 +21,11 @@ const CalendarGrid = ({
   entityIds,
   entityNames,
   entityColors,
+  onButtonClick,
 }: CalendarGridProps) => {
   const [show, setShow] = useState(false)
+  const [editable, setEditable] = useState(false)
+  const [tempSchedule, setTempSchedule] = useState(schedule)
   // Преобразуем строку в массив элементов
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   // Пустые дни
@@ -46,16 +51,29 @@ const CalendarGrid = ({
     }, 5)
   }, [])
 
-  return (
-    <div className={show ? styles.animOn : styles.animOff}>
-      <div className={styles.grid_container}>
-        {fakeDays.map((_, index) => (
-          <div key={`fake-${index}`} className={styles.grid_item}></div>
-        ))}
+  const onSelectedDwropDown = (selected: string, index: number) => {
+    setTempSchedule(
+      tempSchedule.map((item, index) =>
+        index === index ? entityIds.indexOf(selected).toString() : item
+      )
+    )
+    setEditable(true)
+    console.log(tempSchedule)
+  }
+
+  interface ScheduleTableProp {
+    schedule: string[]
+  }
+
+  function ScheduleTable({ schedule }: ScheduleTableProp) {
+    return (
+      <>
         {schedule.map((day, index) => (
-          <a
-            onClick={() => {}}
+          <DropDown
+            onSelected={onSelectedDwropDown}
             className={styles.grid_item}
+            options={entityNames}
+            index={index}
             key={`day-${index}`}
             style={{
               cursor: 'pointer',
@@ -69,9 +87,28 @@ const CalendarGrid = ({
             }}
           >
             {index + 1}
-          </a>
+          </DropDown>
         ))}
+      </>
+    )
+  }
+
+  return (
+    <div className={show ? styles.animOn : styles.animOff}>
+      <div className={styles.grid_container}>
+        {fakeDays.map((_, index) => (
+          <div key={`fake-${index}`} className={styles.grid_item}></div>
+        ))}
+        <ScheduleTable schedule={editable ? tempSchedule : schedule} />
       </div>
+
+      {editable ? (
+        <div className={styles.editable_container}>
+          <button className={styles.editable_button}>Отменить</button>
+          <button className={styles.editable_button}>Применить</button>
+        </div>
+      ) : null}
+
       <div className={styles.job_container}>
         {entityIds.map((job, index) => (
           <div

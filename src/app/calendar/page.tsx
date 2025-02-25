@@ -18,11 +18,12 @@ import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
 import { useParams, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
 import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
+import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
+import DropDown from '@/components/DropDown/DropDown'
 
 const Calendar = () => {
   const [schedule, setSchedule] = useState<string[]>([])
-  //const [error, setError] = useState<string>('')
-  const [job, setJob] = useState<JobsData>()
+  //const [error, setError] = useState<string>(''
   const [isLoading, setIsLoading] = useState(true)
 
   const [entityIds, setEntityIds] = useState<string[]>()
@@ -34,6 +35,10 @@ const Calendar = () => {
   const id = searchParams.get('id')
   const year = searchParams.get('year')
   const month = searchParams.get('month')
+
+  const handleChildButtonClick = (message: string) => {
+    alert(`Сообщение от ребенка: ${message}`)
+  }
 
   useEffect(() => {
     if (type == 'user') {
@@ -117,7 +122,6 @@ const Calendar = () => {
 
       const jobData = docSnapshot.data() as JobsData
 
-      setJob(jobData)
       handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
     } catch (error) {}
   }
@@ -180,7 +184,7 @@ const Calendar = () => {
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
   return (
-    <>
+    <ResponsiveLayout>
       <div className={styles.grid_container}>
         {weekDays.map((day, index) => (
           <div key={index} className={styles.grid_week_days}>
@@ -198,9 +202,10 @@ const Calendar = () => {
           entityIds={entityIds ?? []}
           entityNames={entityNames ?? []}
           entityColors={entityColors}
+          onButtonClick={handleChildButtonClick}
         />
       </Loader>
-    </>
+    </ResponsiveLayout>
   )
 }
 
