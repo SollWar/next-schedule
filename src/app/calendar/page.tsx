@@ -43,12 +43,13 @@ const Calendar = () => {
       }
     } else if (type == 'job') {
       if (id != null && year != null && month != null) {
-        handleJobData('1')
+        handleJobData(id)
       }
     }
   }, [])
 
   const handleJobSchedule = async (
+    jobId: string,
     usersIds: string[],
     year: string,
     month: string
@@ -71,7 +72,7 @@ const Calendar = () => {
 
       for (let i = 0; i < monthLength; i++) {
         for (let j = 0; j < usersData.length; j++) {
-          if (usersData[j].schedule[year]?.[month].split(',')[i] == '1') {
+          if (usersData[j].schedule[year]?.[month].split(',')[i] == jobId) {
             if (summarySchedule[i] != '0') {
               summarySchedule[i] = 'error'
             } else {
@@ -89,9 +90,12 @@ const Calendar = () => {
         entityNames.push(user.user_name)
         entityColors.push(user.user_color)
       })
-      entityColors.push('#ff0000')
-      entityNames.push('Совпадают')
-      entityIds.push('error')
+      if (summarySchedule.indexOf('error') != -1) {
+        entityColors.push('#ff0000')
+        entityNames.push('Совпадают')
+        entityIds.push('error')
+      }
+
       setSchedule(summarySchedule)
       setEntityIds(usersIds)
       setEntityNames(entityNames)
@@ -114,7 +118,7 @@ const Calendar = () => {
       const jobData = docSnapshot.data() as JobsData
 
       setJob(jobData)
-      handleJobSchedule(jobData?.users as string[], year!, month!)
+      handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
     } catch (error) {}
   }
 

@@ -4,6 +4,7 @@ import styles from './CalendarGrid.module.css'
 import { JobsData } from '@/types/firestore-data'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import Loader from '../Loader/Loader'
+import { useEffect, useState } from 'react'
 //import { useState } from 'react'
 
 interface CalendarGridProps {
@@ -19,6 +20,7 @@ const CalendarGrid = ({
   entityNames,
   entityColors,
 }: CalendarGridProps) => {
+  const [show, setShow] = useState(false)
   // Преобразуем строку в массив элементов
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   // Пустые дни
@@ -34,8 +36,18 @@ const CalendarGrid = ({
     })
   })
 
+  const shangeShow = () => {
+    setShow(!show)
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      shangeShow()
+    }, 5)
+  }, [])
+
   return (
-    <>
+    <div className={show ? styles.animOn : styles.animOff}>
       <div className={styles.grid_container}>
         {fakeDays.map((_, index) => (
           <div key={`fake-${index}`} className={styles.grid_item}></div>
@@ -89,7 +101,7 @@ const CalendarGrid = ({
           </div>
         ))}
       </div>
-    </>
+    </div>
   )
 }
 
