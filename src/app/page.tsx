@@ -5,15 +5,19 @@ import Image from 'next/image'
 import styles from './page.module.css'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import useFakeAuthInit from '@/hooks/useFakeAuthInit'
 
 export default function Home() {
-  const { user, validationResult, loginResult } = useAuthInit()
+  ///TODO(Заменить перед публикацией)
+  const { user, validationResult, loginResult } = useFakeAuthInit()
   const router = useRouter()
 
   useEffect(() => {
     if (user?.uid) {
       setTimeout(() => {
-        router.replace('/calendar')
+        router.replace(
+          '/calendar?type=user&id=6376611308&year=2025&month=Февраль'
+        )
       }, 10)
     }
   }, [user, router])

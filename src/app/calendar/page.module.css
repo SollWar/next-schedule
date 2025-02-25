@@ -1,1 +1,16 @@
+.grid_container {
+  display: grid; /* Отображать как контейнер */
+  grid-template-columns: repeat(7, 1fr); /* 7 колонок */
+  gap: 0.1rem; /* Отступы между элементами */
+  width: 100%; /* Контейнер занимает всю доступную ширину */
+  max-width: 900px; /* Максимальная ширина контейнера */
+  margin: 0 auto; /* Центрирование контейнера */
+}
 
+.grid_week_days {
+  text-align: center;
+  border-radius: 6px;
+  background: white;
+  font-size: 20px;
+  margin-bottom: 0.1rem;
+}

@@ -3,33 +3,117 @@ import { db } from '@/lib/firebase'
 import {
   collection,
   doc,
+  DocumentData,
+  DocumentReference,
   getDoc,
   getDocs,
   query,
   where,
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
-//import styles from './page.module.css'
+import styles from './page.module.css'
 //import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
+import { useParams, useSearchParams } from 'next/navigation'
+import Loader from '@/components/Loader/Loader'
+import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 
 const Calendar = () => {
   const [schedule, setSchedule] = useState<string>('')
   //const [error, setError] = useState<string>('')
-  const [jobs, setJobs] = useState<JobsData[]>([])
+  const [job, setJob] = useState<JobsData>()
   const [isLoading, setIsLoading] = useState(true)
-  const [userData, setUserData] = useState<UserData>()
 
-  const year = '2025'
-  const month = 'Февраль'
+  const [entityIds, setEntityIds] = useState<string[]>()
+  const [entityNames, setEntityNames] = useState<string[]>()
+  const [entityColors, setEntityColors] = useState<string[]>([])
+
+  const searchParams = useSearchParams()
+  const type = searchParams.get('type')
+  const id = searchParams.get('id')
+  const year = searchParams.get('year')
+  const month = searchParams.get('month')
 
   useEffect(() => {
-    handleUserData('6376611308')
-    getJobsName('6376611308')
+    if (type == 'user') {
+      if (id != null && year != null && month != null) {
+        handleUserData(id, year, month)
+        getJobsName(id)
+      }
+    } else if (type == 'job') {
+      if (id != null && year != null && month != null) {
+        handleJobData('1')
+      }
+    }
   }, [])
 
-  const handleUserData = async (userId: string) => {
+  const handleJobSchedule = async (
+    usersIds: string[],
+    year: string,
+    month: string
+  ) => {
+    try {
+      const usersQuery = query(
+        collection(db, 'users'),
+        where('__name__', 'in', usersIds)
+      ) // Firestore позволяет max 30 ID в `in`
+      const querySnapshot = await getDocs(usersQuery)
+
+      const usersData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as UserData),
+      }))
+
+      const monthLength = usersData[0].schedule[year]?.[month].split(',').length
+
+      const summarySchedule: string[] = new Array(monthLength).fill(0)
+
+      for (let i = 0; i < monthLength; i++) {
+        for (let j = 0; j < usersData.length; j++) {
+          if (usersData[j].schedule[year]?.[month].split(',')[i] == '1') {
+            summarySchedule[i] = usersData[j].id
+          }
+        }
+      }
+
+      const entityNames: string[] = []
+      const entityColors: string[] = ['#FFFFFF']
+      usersData.forEach((user) => {
+        entityNames.push(user.user_name)
+        entityColors.push(user.user_color)
+      })
+      setSchedule(summarySchedule.join(','))
+      setEntityIds(usersIds)
+      setEntityNames(entityNames)
+      setEntityColors(entityColors)
+    } catch (error) {
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleJobData = async (jobId: string) => {
+    try {
+      const jobDocRef = doc(db, 'jobs', jobId)
+      const docSnapshot = await getDoc(jobDocRef)
+
+      if (!docSnapshot.exists()) {
+        throw new Error('Документ не найден')
+      }
+
+      const jobData = docSnapshot.data() as JobsData
+
+      setJob(jobData)
+      handleJobSchedule(jobData?.users as string[], year!, month!)
+    } catch (error) {}
+  }
+
+  const handleUserData = async (
+    userId: string,
+    year: string,
+    month: string
+  ) => {
     try {
       const userDocRef = doc(db, 'users', userId)
       const docSnapshot = await getDoc(userDocRef)
@@ -40,15 +124,13 @@ const Calendar = () => {
       const userData = docSnapshot.data() as UserData
       const februaryDays = userData.schedule[year]?.[month]
 
-      setUserData(userData)
-      setSchedule(februaryDays)
+      const entityIds = [
+        ...new Set(userData?.schedule[year!]?.[month!].split(',')),
+      ].filter((item) => item !== '0')
 
-      // const userDoc = await collection(db, 'users')
-      // Получение всех документов и итерация по ним
-      // const getDoc = await getDocs(userDoc)
-      // const usersList = getDoc.docs.map((doc) => doc.data() as UserData)
-      // const februaryDays = usersList[0]?.schedule['2025']?.['Февраль']
-      // setSchedule(februaryDays)
+      setEntityIds(entityIds)
+
+      setSchedule(februaryDays)
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)
@@ -65,7 +147,15 @@ const Calendar = () => {
       const querySnapshot = await getDocs(q)
       const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobsData)
 
-      setJobs(jobsList)
+      const entityNames: string[] = []
+      const entityColors: string[] = ['#FFFFFF']
+      jobsList.forEach((job) => {
+        entityNames.push(job.job_name)
+        entityColors.push(job.job_color)
+      })
+
+      setEntityNames(entityNames)
+      setEntityColors(entityColors)
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)
@@ -74,13 +164,30 @@ const Calendar = () => {
     }
   }
 
+  const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
+
   return (
-    <CalendarGrid
-      jobsDataList={jobs}
-      schedule={schedule}
-      jobs={[...new Set(userData?.schedule[year]?.[month].split(','))]}
-      isLoading={isLoading}
-    />
+    <>
+      <div className={styles.grid_container}>
+        {weekDays.map((day, index) => (
+          <div key={index} className={styles.grid_week_days}>
+            {day}
+          </div>
+        ))}
+      </div>
+      <Loader
+        isLoading={isLoading}
+        days={getDaysInMonth(2025, 2)}
+        fakeDays={getFirstWeekdayOfMonth(2025, 1) - 1}
+      >
+        <CalendarGrid
+          schedule={schedule}
+          entityIds={entityIds ?? []}
+          entityNames={entityNames ?? []}
+          entityColors={entityColors}
+        />
+      </Loader>
+    </>
   )
 }
 

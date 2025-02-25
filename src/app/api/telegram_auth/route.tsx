@@ -1,6 +1,6 @@
 import { InitData } from '@/types/telegram-data'
-import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
+import { createHmac } from 'node:crypto'
 
 // POST на валидацию телеграм
 export async function POST(request: Request) {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const telegramID = jsonInitData.user.id
 
     // Получите токен бота из переменных окружения
-    const botToken = process.env.FIREBASE_ADMIN_BOT_TOKEN
+    const botToken = process.env.TELEGRAM_BOT_TOKEN
 
     if (!botToken) {
       throw new Error('BOT_TOKEN is not defined in .env')

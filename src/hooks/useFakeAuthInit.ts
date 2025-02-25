@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth'
 import useUserAuth from './useUserAuth'
 
-const useUserInit = () => {
+const useFakeUserInit = () => {
   const { isLoaded, initData } = useTelegramScript()
   const { user, loading } = useUserAuth()
 
@@ -28,25 +28,7 @@ const useUserInit = () => {
   }, [isLoaded, loading])
 
   const startAuth = async () => {
-    const telegramID = await telegramValidation()
-    if (telegramID) {
-      await firebaseLogin(telegramID)
-    }
-  }
-
-  const telegramValidation = async () => {
-    const res = await fetch('/api/telegram_auth', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ initData }),
-    })
-
-    const { telegramID } = await res.json()
-
-    setValidationResult(telegramID ? '✓' : 'X')
-    return telegramID
+    await firebaseLogin('6376611308')
   }
 
   const firebaseLogin = async (telegramID?: string) => {
@@ -72,4 +54,4 @@ const useUserInit = () => {
   return { user, validationResult, loginResult }
 }
 
-export default useUserInit // <-- экспортируем с новым названием
+export default useFakeUserInit // <-- экспортируем с новым названием
