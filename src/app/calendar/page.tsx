@@ -20,7 +20,7 @@ import Loader from '@/components/Loader/Loader'
 import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 
 const Calendar = () => {
-  const [schedule, setSchedule] = useState<string>('')
+  const [schedule, setSchedule] = useState<string[]>([])
   //const [error, setError] = useState<string>('')
   const [job, setJob] = useState<JobsData>()
   const [isLoading, setIsLoading] = useState(true)
@@ -72,18 +72,27 @@ const Calendar = () => {
       for (let i = 0; i < monthLength; i++) {
         for (let j = 0; j < usersData.length; j++) {
           if (usersData[j].schedule[year]?.[month].split(',')[i] == '1') {
-            summarySchedule[i] = usersData[j].id
+            if (summarySchedule[i] != '0') {
+              summarySchedule[i] = 'error'
+            } else {
+              summarySchedule[i] = usersData[j].id
+            }
           }
         }
       }
+      console.log(summarySchedule)
 
+      const entityIds: string[] = usersIds
       const entityNames: string[] = []
       const entityColors: string[] = ['#FFFFFF']
       usersData.forEach((user) => {
         entityNames.push(user.user_name)
         entityColors.push(user.user_color)
       })
-      setSchedule(summarySchedule.join(','))
+      entityColors.push('#ff0000')
+      entityNames.push('Совпадают')
+      entityIds.push('error')
+      setSchedule(summarySchedule)
       setEntityIds(usersIds)
       setEntityNames(entityNames)
       setEntityColors(entityColors)
@@ -122,7 +131,7 @@ const Calendar = () => {
         throw new Error('Документ не найден')
       }
       const userData = docSnapshot.data() as UserData
-      const februaryDays = userData.schedule[year]?.[month]
+      const schedule = userData.schedule[year]?.[month]
 
       const entityIds = [
         ...new Set(userData?.schedule[year!]?.[month!].split(',')),
@@ -130,7 +139,7 @@ const Calendar = () => {
 
       setEntityIds(entityIds)
 
-      setSchedule(februaryDays)
+      setSchedule(schedule.split(','))
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)

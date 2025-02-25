@@ -7,7 +7,7 @@ import Loader from '../Loader/Loader'
 //import { useState } from 'react'
 
 interface CalendarGridProps {
-  schedule: string
+  schedule: string[]
   entityIds: string[]
   entityNames: string[]
   entityColors: string[]
@@ -20,14 +20,13 @@ const CalendarGrid = ({
   entityColors,
 }: CalendarGridProps) => {
   // Преобразуем строку в массив элементов
-  const days = schedule.split(',')
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   // Пустые дни
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
 
-  const jobCount = new Array(days.length).fill(0)
+  const jobCount = new Array(schedule.length).fill(0)
 
-  days.map((day) => {
+  schedule.map((day) => {
     entityIds.map((job, index) => {
       if (day == job) {
         jobCount[index]++
@@ -41,7 +40,7 @@ const CalendarGrid = ({
         {fakeDays.map((_, index) => (
           <div key={`fake-${index}`} className={styles.grid_item}></div>
         ))}
-        {days.map((day, index) => (
+        {schedule.map((day, index) => (
           <a
             onClick={() => {}}
             className={styles.grid_item}

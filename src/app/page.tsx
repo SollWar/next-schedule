@@ -1,24 +1,26 @@
 'use client'
 
-import useAuthInit from '@/hooks/useAuthInit'
 import Image from 'next/image'
 import styles from './page.module.css'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import useFakeAuthInit from '@/hooks/useFakeAuthInit'
+import useAuthInit from '@/hooks/useAuthInit'
+import { MONTH } from '@/utils/dateUtils'
 
 export default function Home() {
-  ///TODO(Заменить перед публикацией)
-  const { user, validationResult, loginResult } = useFakeAuthInit()
+  const { user, authResult } = useAuthInit()
   const router = useRouter()
 
   useEffect(() => {
     if (user?.uid) {
+      const year = new Date().getFullYear()
+      const month = new Date().getMonth()
+
       setTimeout(() => {
         router.replace(
-          '/calendar?type=user&id=6376611308&year=2025&month=Февраль'
+          `/calendar?type=user&id=6376611308&year=${year}&month=${MONTH[month]}`
         )
-      }, 10)
+      }, 50)
     }
   }, [user, router])
 
@@ -32,33 +34,7 @@ export default function Home() {
           height={128}
           priority // Для критически важных изображений
         />
-        <div className={styles.loading_info}>
-          <div
-            className={
-              validationResult == '' && user == null ? 'loading-dots' : ''
-            }
-          >
-            Получение Telegram ID{' '}
-            {validationResult == '' && user != null ? '⎵' : validationResult}
-          </div>
-          <div
-            className={loginResult == '' && user == null ? 'loading-dots' : ''}
-          >
-            Получение токена Firebase{' '}
-            {loginResult == '' && user != null ? '⎵' : loginResult}
-          </div>
-          <div
-            className={
-              user?.uid == null
-                ? loginResult == 'X'
-                  ? ''
-                  : 'loading-dots'
-                : ''
-            }
-          >
-            Авторизация {user?.uid ? '✓' : loginResult == 'X' ? 'X' : ''}
-          </div>
-        </div>
+        <div className={styles.loader}></div>
       </div>
     </div>
   )
