@@ -13,7 +13,7 @@ interface CalendarGridProps {
   entityIds: string[]
   entityNames: string[]
   entityColors: string[]
-  onButtonClick: (message: string) => void
+  onAcceptClick: (newSchedule: string[]) => void
 }
 
 const CalendarGrid = ({
@@ -21,44 +21,58 @@ const CalendarGrid = ({
   entityIds,
   entityNames,
   entityColors,
-  onButtonClick,
+  onAcceptClick,
 }: CalendarGridProps) => {
   const [show, setShow] = useState(false)
   const [editable, setEditable] = useState(false)
   const [tempSchedule, setTempSchedule] = useState(schedule)
-  // Преобразуем строку в массив элементов
+  const [jobCounts, setJobCounts] = useState<number[]>([])
+
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   // Пустые дни
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
 
-  const jobCount = new Array(schedule.length).fill(0)
-
-  schedule.map((day) => {
-    entityIds.map((job, index) => {
-      if (day == job) {
-        jobCount[index]++
-      }
+  const calculateJobCount = (schedule: string[]) => {
+    const jobCount = new Array(schedule.length).fill(0)
+    schedule.map((day) => {
+      entityIds.map((job, index) => {
+        if (day == job) {
+          jobCount[index]++
+        }
+      })
     })
-  })
+    setJobCounts(jobCount)
+  }
 
   const shangeShow = () => {
     setShow(!show)
   }
 
+  const offEditable = () => {
+    setEditable(false)
+    setTempSchedule(schedule)
+    calculateJobCount(schedule)
+  }
+
+  // Почему-то иногда случается двойной вызов
   useEffect(() => {
+    calculateJobCount(schedule)
     setTimeout(() => {
       shangeShow()
     }, 5)
   }, [])
 
-  const onSelectedDwropDown = (selected: string, index: number) => {
+  const onSelectedDwropDown = (selected: string, selecteIndex: number) => {
+    if (!editable) {
+      setEditable(true)
+    }
     setTempSchedule(
       tempSchedule.map((item, index) =>
-        index === index ? entityIds.indexOf(selected).toString() : item
+        index === selecteIndex ? entityIds[entityNames.indexOf(selected)] : item
       )
     )
-    setEditable(true)
-    console.log(tempSchedule)
+    // Не успевает получить новое значение tempSchedule
+    calculateJobCount(tempSchedule)
   }
 
   interface ScheduleTableProp {
@@ -104,8 +118,20 @@ const CalendarGrid = ({
 
       {editable ? (
         <div className={styles.editable_container}>
-          <button className={styles.editable_button}>Отменить</button>
-          <button className={styles.editable_button}>Применить</button>
+          <button
+            onClick={() => {
+              offEditable()
+            }}
+            className={styles.editable_button}
+          >
+            Отменить
+          </button>
+          <button
+            onClick={() => onAcceptClick(tempSchedule)}
+            className={styles.editable_button}
+          >
+            Применить
+          </button>
         </div>
       ) : null}
 
@@ -133,7 +159,7 @@ const CalendarGrid = ({
               }}
               className={styles.job_item}
             >
-              {jobCount[index]}
+              {jobCounts[index]}
             </div>
           </div>
         ))}

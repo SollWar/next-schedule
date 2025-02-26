@@ -24,10 +24,16 @@ const DropDown = ({
   onSelected,
   index,
 }: DropDownProps) => {
+  const [visivle, setVisivle] = useState(false)
   return (
     <DropdownMenu.Root>
       {/* Кнопка для открытия меню */}
-      <DropdownMenu.Trigger className={className} style={style}>
+      <DropdownMenu.Trigger
+        className={`${className} ${
+          visivle ? styles.dropdownContent_Enable : ''
+        }`}
+        style={style}
+      >
         {children}
       </DropdownMenu.Trigger>
 

@@ -32,7 +32,7 @@ export default function Home() {
           alt="Описание изображения"
           width={128}
           height={128}
-          priority // Для критически важных изображений
+          priority={true} // Для критически важных изображений
         />
         <div className={styles.loader}></div>
       </div>

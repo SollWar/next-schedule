@@ -15,13 +15,19 @@ import styles from './page.module.css'
 //import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
-import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
+import {
+  getDaysInMonth,
+  getFirstWeekdayOfMonth,
+  MONTH,
+} from '@/utils/dateUtils'
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
 import DropDown from '@/components/DropDown/DropDown'
+import useUserAuth from '@/hooks/useUserAuth'
 
 const Calendar = () => {
+  const { user } = useUserAuth()
   const [schedule, setSchedule] = useState<string[]>([])
   //const [error, setError] = useState<string>(''
   const [isLoading, setIsLoading] = useState(true)
@@ -29,6 +35,7 @@ const Calendar = () => {
   const [entityIds, setEntityIds] = useState<string[]>()
   const [entityNames, setEntityNames] = useState<string[]>()
   const [entityColors, setEntityColors] = useState<string[]>([])
+  const router = useRouter()
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -36,8 +43,41 @@ const Calendar = () => {
   const year = searchParams.get('year')
   const month = searchParams.get('month')
 
-  const handleChildButtonClick = (message: string) => {
-    alert(`Сообщение от ребенка: ${message}`)
+  const scheduleUpdate = async (
+    newSchedule: string[],
+    type: string,
+    id: string,
+    year: string,
+    month: string,
+    usersId: string[]
+  ) => {
+    const res = await fetch('/api/schedule_update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newSchedule, type, id, year, month, usersId }),
+    })
+
+    await res.json()
+    if (type == 'user') {
+      handleUserData(id, year, month)
+      getJobsName(id)
+    } else if (type == 'job') {
+      handleJobData(id)
+    }
+  }
+
+  const handleChildButtonClick = (newSchedule: string[]) => {
+    setIsLoading(true)
+    scheduleUpdate(
+      newSchedule,
+      type ?? '',
+      id ?? '',
+      year ?? '',
+      month ?? '',
+      entityIds ?? []
+    )
   }
 
   useEffect(() => {
@@ -86,7 +126,6 @@ const Calendar = () => {
           }
         }
       }
-      console.log(summarySchedule)
 
       const entityIds: string[] = usersIds
       const entityNames: string[] = []
@@ -141,9 +180,7 @@ const Calendar = () => {
       const userData = docSnapshot.data() as UserData
       const schedule = userData.schedule[year]?.[month]
 
-      const entityIds = [
-        ...new Set(userData?.schedule[year!]?.[month!].split(',')),
-      ].filter((item) => item !== '0')
+      const entityIds = userData.jobs
 
       setEntityIds(entityIds)
 
@@ -202,7 +239,7 @@ const Calendar = () => {
           entityIds={entityIds ?? []}
           entityNames={entityNames ?? []}
           entityColors={entityColors}
-          onButtonClick={handleChildButtonClick}
+          onAcceptClick={handleChildButtonClick}
         />
       </Loader>
     </ResponsiveLayout>

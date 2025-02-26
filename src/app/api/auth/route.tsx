@@ -17,6 +17,25 @@ if (!admin.apps.length) {
 // POST на валидацию телеграм
 export async function POST(request: Request) {
   try {
+    //TODO(УБРАТЬ)
+    ////////
+
+    let customToken:
+      | string
+      | NextResponse<{
+          error: string
+        }> = await firebaseAuth(6376611308)
+
+    return NextResponse.json({ customToken })
+
+    ////////
+    /*
+    let customToken:
+      | string
+      | NextResponse<{
+          error: string
+        }> = ''
+
     // Получение initData из запроса
     const { initData } = await request.json()
 
@@ -31,7 +50,6 @@ export async function POST(request: Request) {
     // Получение полей initData
     const jsonInitData = parseInitData(initData)
 
-    console.log('Telegram ID:', jsonInitData.user.id)
     const telegramID = jsonInitData.user.id
 
     // Получите токен бота из переменных окружения
@@ -44,10 +62,11 @@ export async function POST(request: Request) {
     const isValid = manualValidate(initData, botToken)
 
     if (isValid) {
-      firebaseAuth(telegramID)
+      customToken = await firebaseAuth(telegramID)
     }
 
-    return NextResponse.json({})
+    return NextResponse.json({ customToken })
+    */
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Validation failed' },
@@ -115,6 +134,8 @@ function parseInitData(queryString: string): InitData {
 }
 
 async function firebaseAuth(telegramID: number) {
+  console.log(telegramID)
+
   // Если UID не получен
   if (!telegramID) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
@@ -136,5 +157,5 @@ async function firebaseAuth(telegramID: number) {
     .createCustomToken(telegramID.toString())
 
   // И возвращаем токен клиенту
-  return NextResponse.json({ customToken })
+  return customToken
 }

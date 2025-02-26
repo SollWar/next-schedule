@@ -27,7 +27,7 @@
   text-align: center;
   border-radius: 12px;
   color: white;
-  font-size: 36px;
+  font-size: 32px;
 }
 
 .grid_item:focus-visible {
@@ -37,8 +37,7 @@
 .editable_container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20vw;
-
+  gap: 10vw;
   width: 100%; /* Контейнер занимает всю доступную ширину */
   max-width: 900px; /* Максимальная ширина контейнера */
   margin: 4px auto; /* Центрирование контейнера */
@@ -48,15 +47,15 @@
   text-align: center;
   border-radius: 12px;
   color: black;
-  font-size: 32px;
-  padding: 17.5px;
+  font-size: 28px;
+  height: 48px;
   cursor: pointer;
 }
 
 .job_container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.1rem;
+  gap: 2px;
 
   width: 100%; /* Контейнер занимает всю доступную ширину */
   max-width: 900px; /* Максимальная ширина контейнера */
@@ -64,10 +63,11 @@
 }
 
 .job_item {
+  height: 4.2rem;
   text-align: center;
   border-radius: 12px;
   color: white;
-  font-size: 32px;
+  font-size: 28px;
 }
 
 .grid_week_days {
