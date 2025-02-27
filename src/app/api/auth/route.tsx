@@ -40,6 +40,7 @@ export async function POST(request: Request) {
 
     // Проверка есть ли initData в запросе
     if (!initData) {
+      console.log('initData is required')
       return NextResponse.json(
         { error: 'initData is required' },
         { status: 400 }
@@ -54,11 +55,14 @@ export async function POST(request: Request) {
     // Получите токен бота из переменных окружения
     const botToken = process.env.TELEGRAM_BOT_TOKEN
 
+    console.log('BOT_TOKEN is not defined in .env')
     if (!botToken) {
       throw new Error('BOT_TOKEN is not defined in .env')
     }
     // Проверка валидности данных
     const isValid = manualValidate(initData, botToken)
+
+    console.log(isValid)
 
     if (isValid) {
       customToken = await firebaseAuth(telegramID)
