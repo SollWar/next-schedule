@@ -22,7 +22,7 @@ const Calendar = () => {
   const [schedule, setSchedule] = useState<string[]>([])
   //const [error, setError] = useState<string>(''
   const [isLoading, setIsLoading] = useState(true)
-
+  const [scheduleName, setScheduleName] = useState('')
   const [entityIds, setEntityIds] = useState<string[]>()
   const [entityNames, setEntityNames] = useState<string[]>()
   const [entityColors, setEntityColors] = useState<string[]>([])
@@ -93,7 +93,8 @@ const Calendar = () => {
     jobId: string,
     usersIds: string[],
     year: string,
-    month: string
+    month: string,
+    jobName: string
   ) => {
     try {
       const usersQuery = query(
@@ -135,7 +136,7 @@ const Calendar = () => {
         entityNames.push('Совпадают')
         entityIds.push('error')
       }
-
+      setScheduleName(jobName)
       setSchedule(summarySchedule)
       setEntityIds(usersIds)
       setEntityNames(entityNames)
@@ -158,7 +159,13 @@ const Calendar = () => {
 
       const jobData = docSnapshot.data() as JobsData
 
-      handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
+      handleJobSchedule(
+        jobId,
+        jobData?.users as string[],
+        year!,
+        month!,
+        jobData?.job_name
+      )
     } catch (error) {
       console.log(error)
     }
@@ -181,8 +188,8 @@ const Calendar = () => {
 
       const entityIds = userData.jobs
 
+      setScheduleName(userData.user_name)
       setEntityIds(entityIds)
-
       setSchedule(schedule.split(','))
     } catch (error) {
       console.log(error)
@@ -220,7 +227,10 @@ const Calendar = () => {
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
   return (
-    <ResponsiveLayout onNewQueryClicl={onNewQueryClicl}>
+    <ResponsiveLayout
+      onNewQueryClicl={onNewQueryClicl}
+      currentScheduleName={scheduleName}
+    >
       <div className={styles.grid_container}>
         {weekDays.map((day, index) => (
           <div key={index} className={styles.grid_week_days}>

@@ -18,11 +18,5 @@ export default function CalendarLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <html lang="en">
-      <body className={roboto.className}>
-        <Suspense>{children}</Suspense>
-      </body>
-    </html>
-  )
+  return <Suspense>{children}</Suspense>
 }

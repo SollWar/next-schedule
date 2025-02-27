@@ -1,23 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './ResponsiveLayout.module.css'
 import { useRouter } from 'next/navigation'
 import DropDown from '../DropDown/DropDown'
 
 interface ResponsiveLayoutProps {
   onNewQueryClicl: (query: string) => void
+  currentScheduleName: string
   children: React.ReactNode
 }
 
 export default function ResponsiveLayout({
   onNewQueryClicl,
+  currentScheduleName,
   children,
 }: ResponsiveLayoutProps) {
-  const [schedule, setSchedule] = useState('Никита')
   const [year] = useState(2025)
   const [month] = useState('Февраль')
   const router = useRouter()
+
+  useEffect(() => {}, [])
 
   const onSelectedDwropDown = async (
     selected: string,
@@ -25,14 +28,11 @@ export default function ResponsiveLayout({
   ) => {
     switch (selecteIndex) {
       case 0: {
-        setSchedule(selected)
-        if (selected == 'Никита') {
-          console.log(selected)
+        if (selected == 'Никита' && currentScheduleName != 'Никита') {
           onNewQueryClicl(
             `/calendar?type=user&id=6376611308&year=${year}&month=${month}`
           )
-        } else if (selected === 'М7') {
-          console.log(selected)
+        } else if (selected === 'М7' && currentScheduleName != 'М7') {
           onNewQueryClicl(`/calendar?type=job&id=1&year=${year}&month=${month}`)
         }
       }
@@ -67,7 +67,7 @@ export default function ResponsiveLayout({
                 cursor: 'pointer',
               }}
             >
-              {schedule}
+              {currentScheduleName === '' ? 'Никита' : currentScheduleName}
             </DropDown>
           </div>
           <div
