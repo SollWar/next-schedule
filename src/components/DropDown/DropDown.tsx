@@ -4,8 +4,6 @@ import React, { useState } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import styles from './DropDown.module.css'
 
-const options = ['Пункт 1', 'Пункт 2', 'Пункт 3']
-
 interface DropDownProps {
   options: string[]
   onSelected: (selected: string, index: number) => void
@@ -24,7 +22,7 @@ const DropDown = ({
   onSelected,
   index,
 }: DropDownProps) => {
-  const [visivle, setVisivle] = useState(false)
+  const [visivle] = useState(false)
   return (
     <DropdownMenu.Root>
       {/* Кнопка для открытия меню */}

@@ -1,9 +1,7 @@
 'use client'
-import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
+import { getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import styles from './CalendarGrid.module.css'
-import { JobsData } from '@/types/firestore-data'
 import { getContrastTextColor } from '@/utils/colorsUtils'
-import Loader from '../Loader/Loader'
 import { useEffect, useState } from 'react'
 import DropDown from '../DropDown/DropDown'
 //import { useState } from 'react'
@@ -57,7 +55,6 @@ const CalendarGrid = ({
   // Почему-то иногда случается двойной вызов
   useEffect(() => {
     let forDropDonwItems = [...entityNames]
-    setDropDownItems
     console.log(dropDownItems)
     if (entityNames.indexOf('error') != -1) {
       forDropDonwItems = entityNames.filter((entity) => entity !== 'error')

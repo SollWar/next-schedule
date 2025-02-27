@@ -13,7 +13,7 @@ import styles from './page.module.css'
 //import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
 import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
@@ -26,6 +26,7 @@ const Calendar = () => {
   const [entityIds, setEntityIds] = useState<string[]>()
   const [entityNames, setEntityNames] = useState<string[]>()
   const [entityColors, setEntityColors] = useState<string[]>([])
+  const router = useRouter()
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -70,6 +71,11 @@ const Calendar = () => {
     )
   }
 
+  const onNewQueryClicl = (query: string) => {
+    router.replace(query)
+    setIsLoading(true)
+  }
+
   useEffect(() => {
     if (type == 'user') {
       if (id != null && year != null && month != null) {
@@ -81,7 +87,7 @@ const Calendar = () => {
         handleJobData(id)
       }
     }
-  }, [])
+  }, [type, id, year, month])
 
   const handleJobSchedule = async (
     jobId: string,
@@ -135,6 +141,7 @@ const Calendar = () => {
       setEntityNames(entityNames)
       setEntityColors(entityColors)
     } catch (error) {
+      console.log(error)
     } finally {
       setIsLoading(false)
     }
@@ -152,7 +159,9 @@ const Calendar = () => {
       const jobData = docSnapshot.data() as JobsData
 
       handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const handleUserData = async (
@@ -211,7 +220,7 @@ const Calendar = () => {
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
   return (
-    <ResponsiveLayout>
+    <ResponsiveLayout onNewQueryClicl={onNewQueryClicl}>
       <div className={styles.grid_container}>
         {weekDays.map((day, index) => (
           <div key={index} className={styles.grid_week_days}>

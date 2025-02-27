@@ -8,7 +8,7 @@ import useAuthInit from '@/hooks/useAuthInit'
 import { MONTH } from '@/utils/dateUtils'
 
 export default function Home() {
-  const { user, authResult } = useAuthInit()
+  const { user } = useAuthInit()
   const router = useRouter()
 
   useEffect(() => {

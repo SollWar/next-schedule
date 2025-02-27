@@ -14,10 +14,9 @@ if (!admin.apps.length) {
   })
 }
 
-// POST на валидацию телеграм
 export async function POST(request: Request) {
   try {
-    //TODO(УБРАТЬ)
+    /*
     ////////
 
     let customToken:
@@ -28,8 +27,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ customToken })
 
-    ////////
-    /*
+    */
+
     let customToken:
       | string
       | NextResponse<{
@@ -66,7 +65,6 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ customToken })
-    */
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Validation failed' },
