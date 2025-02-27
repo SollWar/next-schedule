@@ -27,9 +27,9 @@ const CalendarGrid = ({
   const [editable, setEditable] = useState(false)
   const [tempSchedule, setTempSchedule] = useState(schedule)
   const [jobCounts, setJobCounts] = useState<number[]>([])
+  const [dropDownItems, setDropDownItems] = useState<string[]>([''])
 
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
-  // Пустые дни
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
 
   const calculateJobCount = (schedule: string[]) => {
@@ -56,6 +56,14 @@ const CalendarGrid = ({
 
   // Почему-то иногда случается двойной вызов
   useEffect(() => {
+    let forDropDonwItems = [...entityNames]
+    setDropDownItems
+    console.log(dropDownItems)
+    if (entityNames.indexOf('error') != -1) {
+      forDropDonwItems = entityNames.filter((entity) => entity !== 'error')
+    }
+    forDropDonwItems.push('Выходной')
+    setDropDownItems(forDropDonwItems)
     calculateJobCount(schedule)
     setTimeout(() => {
       shangeShow()
@@ -66,11 +74,20 @@ const CalendarGrid = ({
     if (!editable) {
       setEditable(true)
     }
-    setTempSchedule(
-      tempSchedule.map((item, index) =>
-        index === selecteIndex ? entityIds[entityNames.indexOf(selected)] : item
+    if (selected == 'Выходной') {
+      setTempSchedule(
+        tempSchedule.map((item, index) => (index === selecteIndex ? 'X' : item))
       )
-    )
+    } else {
+      setTempSchedule(
+        tempSchedule.map((item, index) =>
+          index === selecteIndex
+            ? entityIds[entityNames.indexOf(selected)]
+            : item
+        )
+      )
+    }
+
     // Не успевает получить новое значение tempSchedule
     calculateJobCount(tempSchedule)
   }
@@ -86,7 +103,7 @@ const CalendarGrid = ({
           <DropDown
             onSelected={onSelectedDwropDown}
             className={styles.grid_item}
-            options={entityNames}
+            options={dropDownItems}
             index={index}
             key={`day-${index}`}
             style={{

@@ -60,29 +60,27 @@ export async function POST(request: Request) {
       const scheduleForUsers = clearUserIds.map(() =>
         new Array(newSchedule.length).fill('0')
       )
-      clearUserIds.forEach((userId, userIndex) => {
-        newSchedule.forEach((day, index) => {
-          if (day === userId) {
-            scheduleForUsers[userIndex][index] = id
-            // Замена старых данных пользователя на новые пустые
-            // Работает но криво, первый пользователь получает
-            // от второго Х, и не меняет их на 0
-            clearUserIds.forEach((deleteId, deleteIndex) => {
-              if (
-                userId != deleteId &&
-                usersData[deleteIndex].schedule[year][month].split(',')[
-                  index
-                ] == id
-              ) {
-                scheduleForUsers[deleteIndex][index] = 'X'
-              }
-            })
+
+      const currentUserSchedule: string[][] = usersData.map((user) =>
+        user.schedule[year][month].split(',')
+      )
+
+      // Кажись теперь работает правильно
+      newSchedule.forEach((assignedUser, dayIndex) => {
+        clearUserIds.forEach((userId, userIndex) => {
+          if (assignedUser === userId) {
+            // Если по новому расписанию этот пользователь должен работать в этот день,
+            // назначаем в расписании магазина значение id.
+            scheduleForUsers[userIndex][dayIndex] = id
           } else {
-            if (scheduleForUsers[userIndex][index] == 'X') {
-              scheduleForUsers[userIndex][index] = '0'
+            // Если в личном расписании пользователя был назначен магазин (id),
+            // а новый график его не назначает, то ставим выходной ('0').
+            if (currentUserSchedule[userIndex][dayIndex] === id) {
+              scheduleForUsers[userIndex][dayIndex] = '0'
             } else {
-              scheduleForUsers[userIndex][index] =
-                usersData[userIndex].schedule[year][month].split(',')[index]
+              // Иначе оставляем текущее значение из личного расписания.
+              scheduleForUsers[userIndex][dayIndex] =
+                currentUserSchedule[userIndex][dayIndex]
             }
           }
         })

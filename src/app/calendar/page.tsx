@@ -3,8 +3,6 @@ import { db } from '@/lib/firebase'
 import {
   collection,
   doc,
-  DocumentData,
-  DocumentReference,
   getDoc,
   getDocs,
   query,
@@ -15,19 +13,12 @@ import styles from './page.module.css'
 //import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
-import {
-  getDaysInMonth,
-  getFirstWeekdayOfMonth,
-  MONTH,
-} from '@/utils/dateUtils'
+import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
-import DropDown from '@/components/DropDown/DropDown'
-import useUserAuth from '@/hooks/useUserAuth'
 
 const Calendar = () => {
-  const { user } = useUserAuth()
   const [schedule, setSchedule] = useState<string[]>([])
   //const [error, setError] = useState<string>(''
   const [isLoading, setIsLoading] = useState(true)
@@ -35,7 +26,6 @@ const Calendar = () => {
   const [entityIds, setEntityIds] = useState<string[]>()
   const [entityNames, setEntityNames] = useState<string[]>()
   const [entityColors, setEntityColors] = useState<string[]>([])
-  const router = useRouter()
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type')

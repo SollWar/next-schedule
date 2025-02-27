@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import styles from './ResponsiveLayout.module.css'
+import { useRouter } from 'next/navigation'
 
 export default function ResponsiveLayout({
   children,
@@ -9,6 +10,7 @@ export default function ResponsiveLayout({
   children: React.ReactNode
 }) {
   const [loding] = useState(false)
+  const router = useRouter()
 
   return (
     <div className={styles.container}>
@@ -20,7 +22,14 @@ export default function ResponsiveLayout({
               height: '100%',
             }}
           >
-            <button className={styles.menuButton}>Меню</button>
+            <button
+              className={styles.menuButton}
+              onClick={() => {
+                router.push('/setting')
+              }}
+            >
+              Меню
+            </button>
             <button className={styles.menuButton}>Никита</button>
           </div>
           <div
