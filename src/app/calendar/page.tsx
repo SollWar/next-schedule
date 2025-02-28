@@ -17,6 +17,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
 import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
+import { setNewSchedule } from '@/server/schedule_update/actions'
 
 const Calendar = () => {
   const [schedule, setSchedule] = useState<string[]>([])
@@ -42,15 +43,15 @@ const Calendar = () => {
     month: string,
     usersId: string[]
   ) => {
-    const res = await fetch('/api/schedule_update', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ newSchedule, type, id, year, month, usersId }),
+    const res = await setNewSchedule({
+      newSchedule,
+      type,
+      id,
+      year,
+      month,
+      usersId,
     })
 
-    await res.json()
     if (type == 'user') {
       handleUserData(id, year, month)
       getJobsName(id)

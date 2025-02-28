@@ -55,7 +55,6 @@ const CalendarGrid = ({
   // Почему-то иногда случается двойной вызов
   useEffect(() => {
     let forDropDonwItems = [...entityNames]
-    console.log(dropDownItems)
     if (entityNames.indexOf('error') != -1) {
       forDropDonwItems = entityNames.filter((entity) => entity !== 'error')
     }

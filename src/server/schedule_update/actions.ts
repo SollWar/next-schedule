@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+'use server'
 import admin from 'firebase-admin'
 import { UserData } from '@/types/firestore-data'
 import { WriteResult } from 'firebase-admin/firestore'
@@ -23,10 +23,15 @@ interface QueryProps {
   usersId: string[]
 }
 
-export async function POST(request: Request) {
+export async function setNewSchedule({
+  newSchedule,
+  type,
+  id,
+  year,
+  month,
+  usersId,
+}: QueryProps) {
   try {
-    const { newSchedule, type, id, year, month, usersId }: QueryProps =
-      await request.json()
     const db = admin.firestore()
 
     if (type == 'user') {
@@ -100,13 +105,8 @@ export async function POST(request: Request) {
 
       await Promise.all(forUpdate)
     }
-    return NextResponse.json({})
+    return true
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Error updating field',
-      },
-      { status: 500 }
-    )
+    return false
   }
 }
