@@ -1,11 +1,32 @@
+'use client'
+import { useRouter } from 'next/navigation'
+import styles from './page.module.css'
+
 const Setting = () => {
+  const router = useRouter()
+
+  const popUp = () => {
+    router.back()
+  }
+
   return (
-    <div>
-      <h1>Добро пожаловать на страницу Setting!</h1>
-      <p>
-        Это содержимое страницы, которое адаптируется в зависимости от
-        устройства. В данный момент вы на странице настроек!
-      </p>
+    <div className={styles.container}>
+      <div className={styles.mainContent}>
+        <div className={styles.content}>
+          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+            ID Пользователя
+          </button>
+          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+            Имя пользователя
+          </button>
+          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+            Цвет пользователя
+          </button>
+          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+            Список магазинов
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

@@ -10,9 +10,10 @@ import {
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
-//import { FirebaseError } from 'firebase/app'
 import { JobsData, UserData } from '@/types/firestore-data'
-import CalendarGrid from '@/components/CalendarGrid/CalendarGrid'
+import CalendarGrid, {
+  CalendarGridProps,
+} from '@/components/CalendarGrid/CalendarGrid'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
 import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
@@ -20,13 +21,10 @@ import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
 import { setNewSchedule } from '@/server/schedule_update/actions'
 
 const Calendar = () => {
-  const [schedule, setSchedule] = useState<string[]>([])
-  //const [error, setError] = useState<string>(''
+  const [calendarGridProps, setCalendarGridProps] =
+    useState<CalendarGridProps>()
   const [isLoading, setIsLoading] = useState(true)
   const [scheduleName, setScheduleName] = useState('')
-  const [entityIds, setEntityIds] = useState<string[]>()
-  const [entityNames, setEntityNames] = useState<string[]>()
-  const [entityColors, setEntityColors] = useState<string[]>([])
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -54,7 +52,7 @@ const Calendar = () => {
 
     if (type == 'user') {
       handleUserData(id, year, month)
-      getJobsName(id)
+      //getJobsName(id)
     } else if (type == 'job') {
       handleJobData(id)
     }
@@ -68,20 +66,16 @@ const Calendar = () => {
       id ?? '',
       year ?? '',
       month ?? '',
-      entityIds ?? []
+      calendarGridProps?.entityIds ?? []
     )
   }
 
-  const onNewQueryClicl = (query: string) => {
-    router.replace(query)
-    setIsLoading(true)
-  }
-
   useEffect(() => {
+    setIsLoading(true)
     if (type == 'user') {
       if (id != null && year != null && month != null) {
         handleUserData(id, year, month)
-        getJobsName(id)
+        //getJobsName(id)
       }
     } else if (type == 'job') {
       if (id != null && year != null && month != null) {
@@ -137,11 +131,13 @@ const Calendar = () => {
         entityNames.push('Совпадают')
         entityIds.push('error')
       }
+      setCalendarGridProps({
+        schedule: summarySchedule,
+        entityIds: usersIds,
+        entityNames: entityNames,
+        entityColors: entityColors,
+      })
       setScheduleName(jobName)
-      setSchedule(summarySchedule)
-      setEntityIds(usersIds)
-      setEntityNames(entityNames)
-      setEntityColors(entityColors)
     } catch (error) {
       console.log(error)
     } finally {
@@ -189,17 +185,6 @@ const Calendar = () => {
 
       const entityIds = userData.jobs
 
-      setScheduleName(userData.user_name)
-      setEntityIds(entityIds)
-      setSchedule(schedule.split(','))
-    } catch (error) {
-      console.log(error)
-      //setError((error as FirebaseError).message)
-    }
-  }
-
-  const getJobsName = async (userId: string) => {
-    try {
       const q = query(
         collection(db, 'jobs'),
         where('users', 'array-contains', userId)
@@ -215,8 +200,13 @@ const Calendar = () => {
         entityColors.push(job.job_color)
       })
 
-      setEntityNames(entityNames)
-      setEntityColors(entityColors)
+      setCalendarGridProps({
+        schedule: schedule.split(','),
+        entityIds: entityIds,
+        entityNames: entityNames,
+        entityColors: entityColors,
+      })
+      setScheduleName(userData.user_name)
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)
@@ -225,13 +215,37 @@ const Calendar = () => {
     }
   }
 
+  // const getJobsName = async (userId: string) => {
+  //   try {
+  //     const q = query(
+  //       collection(db, 'jobs'),
+  //       where('users', 'array-contains', userId)
+  //     )
+
+  //     const querySnapshot = await getDocs(q)
+  //     const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobsData)
+
+  //     const entityNames: string[] = []
+  //     const entityColors: string[] = ['#FFFFFF']
+  //     jobsList.forEach((job) => {
+  //       entityNames.push(job.job_name)
+  //       entityColors.push(job.job_color)
+  //     })
+
+  //     setEntityNames(entityNames)
+  //     setEntityColors(entityColors)
+  //   } catch (error) {
+  //     console.log(error)
+  //     //setError((error as FirebaseError).message)
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
+
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
   return (
-    <ResponsiveLayout
-      onNewQueryClicl={onNewQueryClicl}
-      currentScheduleName={scheduleName}
-    >
+    <ResponsiveLayout>
       <div className={styles.grid_container}>
         {weekDays.map((day, index) => (
           <div key={index} className={styles.grid_week_days}>
@@ -245,10 +259,10 @@ const Calendar = () => {
         fakeDays={getFirstWeekdayOfMonth(2025, 1) - 1}
       >
         <CalendarGrid
-          schedule={schedule}
-          entityIds={entityIds ?? []}
-          entityNames={entityNames ?? []}
-          entityColors={entityColors}
+          schedule={calendarGridProps?.schedule ?? []}
+          entityIds={calendarGridProps?.entityIds ?? []}
+          entityNames={calendarGridProps?.entityNames ?? []}
+          entityColors={calendarGridProps?.entityColors ?? []}
           onAcceptClick={handleChildButtonClick}
         />
       </Loader>

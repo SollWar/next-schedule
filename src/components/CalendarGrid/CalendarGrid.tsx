@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react'
 import DropDown from '../DropDown/DropDown'
 //import { useState } from 'react'
 
-interface CalendarGridProps {
+export interface CalendarGridProps {
   schedule: string[]
   entityIds: string[]
   entityNames: string[]
   entityColors: string[]
-  onAcceptClick: (newSchedule: string[]) => void
+  onAcceptClick?: (newSchedule: string[]) => void
 }
 
 const CalendarGrid = ({
@@ -35,6 +35,8 @@ const CalendarGrid = ({
     schedule.map((day) => {
       entityIds.map((job, index) => {
         if (day == job) {
+          jobCount[index]++
+        } else if (day === 'error') {
           jobCount[index]++
         }
       })
@@ -70,22 +72,16 @@ const CalendarGrid = ({
     if (!editable) {
       setEditable(true)
     }
-    if (selected == 'Выходной') {
-      setTempSchedule(
-        tempSchedule.map((item, index) => (index === selecteIndex ? 'X' : item))
-      )
-    } else {
-      setTempSchedule(
-        tempSchedule.map((item, index) =>
-          index === selecteIndex
-            ? entityIds[entityNames.indexOf(selected)]
-            : item
-        )
-      )
-    }
 
-    // Не успевает получить новое значение tempSchedule
-    calculateJobCount(tempSchedule)
+    const newTempSchedule = tempSchedule.map((item, index) => {
+      if (index !== selecteIndex) return item
+      return selected === 'Выходной'
+        ? 'X'
+        : entityIds[entityNames.indexOf(selected)]
+    })
+
+    setTempSchedule(newTempSchedule)
+    calculateJobCount(newTempSchedule)
   }
 
   interface ScheduleTableProp {
@@ -140,7 +136,7 @@ const CalendarGrid = ({
             Отменить
           </button>
           <button
-            onClick={() => onAcceptClick(tempSchedule)}
+            onClick={() => onAcceptClick!(tempSchedule)}
             className={styles.editable_button}
           >
             Применить
