@@ -81,7 +81,6 @@ const Calendar = () => {
     if (type == 'user') {
       if (id != null && year != null && month != null) {
         handleUserData(id, year, month)
-        //getJobsName(id)
       }
     } else if (type == 'job') {
       if (id != null && year != null && month != null) {

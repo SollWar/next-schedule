@@ -25,16 +25,18 @@ const CalendarPageHeader = ({
   options,
 }: CalendarPageHeaderProps) => {
   const [schedulesOptions, setSchedulesOptions] = useState<string[]>()
-  const [scheduleName, setScheduleName] = useState<string>(id)
+  const [currentOptions, setCurrentOptions] =
+    useState<CalendarPageHeaderOptions>()
   const router = useRouter()
 
   const onNewQueryClicl = (query: string) => {
+    router.refresh()
     router.replace(query)
   }
 
   useEffect(() => {
     const paramsOptions = options.find((value) => value.id === id)
-    setScheduleName(paramsOptions?.name ?? id)
+    setCurrentOptions(paramsOptions)
     const str: string[] = []
     options.forEach((value) => {
       str.push(value.name)
@@ -49,19 +51,19 @@ const CalendarPageHeader = ({
     switch (selecteIndex) {
       case 0:
         const selectedOptions = options.find((value) => value.name === selected)
-        setScheduleName(selectedOptions?.name ?? '')
+        setCurrentOptions(selectedOptions)
         onNewQueryClicl(
           `/calendar?type=${selectedOptions?.type}&id=${selectedOptions?.id}&year=${year}&month=${month}`
         )
         break
       case 1:
         onNewQueryClicl(
-          `/calendar?type=user&id=6376611308&year=${selected}&month=${month}`
+          `/calendar?type=${currentOptions?.type}&id=${currentOptions?.id}&year=${selected}&month=${month}`
         )
         break
       case 2:
         onNewQueryClicl(
-          `/calendar?type=user&id=6376611308&year=${year}&month=${selected}`
+          `/calendar?type=${currentOptions?.type}&id=${currentOptions?.id}&year=${year}&month=${selected}`
         )
         break
     }
@@ -99,7 +101,7 @@ const CalendarPageHeader = ({
             cursor: 'pointer',
           }}
         >
-          {scheduleName ?? ''}
+          {currentOptions?.name ?? id}
         </DropDown>
       </div>
       <div
