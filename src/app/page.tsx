@@ -19,7 +19,7 @@ export default function Home() {
 
       setTimeout(() => {
         router.replace(
-          `/calendar?type=user&id=6376611308&year=${year}&month=${MONTH[month]}`
+          `/calendar?type=user&id=${user.uid}&year=${year}&month=${MONTH[month]}`
         )
       }, 50)
     }
