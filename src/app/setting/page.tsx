@@ -1,28 +1,27 @@
 'use client'
-import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
 const Setting = () => {
-  const router = useRouter()
+  //const router = useRouter()
 
-  const popUp = () => {
-    router.back()
-  }
+  // const popUp = () => {
+  //   router.back()
+  // }
 
   return (
     <div className={styles.container}>
       <div className={styles.mainContent}>
         <div className={styles.content}>
-          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+          <button className={`${styles.menu_button} ${styles.setting_button}`}>
             ID Пользователя
           </button>
-          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+          <button className={`${styles.menu_button} ${styles.setting_button}`}>
             Имя пользователя
           </button>
-          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+          <button className={`${styles.menu_button} ${styles.setting_button}`}>
             Цвет пользователя
           </button>
-          <button className={`${styles.menuButton} ${styles.setting_button}`}>
+          <button className={`${styles.menu_button} ${styles.setting_button}`}>
             Список магазинов
           </button>
         </div>

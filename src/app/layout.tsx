@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 import Header from '../components/Header/Header'
 import './globals.css'
+import { Suspense } from 'react'
 
 const roboto = Roboto({
   subsets: ['latin', 'cyrillic'], // Укажите поддерживаемые символы (latin, cyrillic и т. д.)
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <Header />
-        {children}
+        <Suspense>
+          <Header />
+          {children}
+        </Suspense>
       </body>
     </html>
   )

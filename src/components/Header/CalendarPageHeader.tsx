@@ -1,4 +1,5 @@
-import { usePathname, useRouter } from 'next/navigation'
+'use client'
+import { useRouter } from 'next/navigation'
 import styles from './Header.module.css'
 import { useEffect, useState } from 'react'
 import DropDown from '../DropDown/DropDown'
@@ -78,7 +79,7 @@ const CalendarPageHeader = ({
         }}
       >
         <button
-          className={`${styles.menuButton} ${styles.iconButton}`}
+          className={`${styles.menu_button} ${styles.icon_button}`}
           onClick={() => {
             router.push('/setting')
           }}
@@ -92,7 +93,7 @@ const CalendarPageHeader = ({
           />
         </button>
         <DropDown
-          className={styles.menuButton}
+          className={styles.menu_button}
           key={'id'}
           options={schedulesOptions ?? []}
           onSelected={onSelectedDwropDown}
@@ -111,7 +112,7 @@ const CalendarPageHeader = ({
         }}
       >
         <DropDown
-          className={styles.menuButton}
+          className={styles.menu_button}
           key={'year'}
           options={['2025', '2026']}
           onSelected={onSelectedDwropDown}
@@ -123,7 +124,7 @@ const CalendarPageHeader = ({
           {year}
         </DropDown>
         <DropDown
-          className={styles.menuButton}
+          className={styles.menu_button}
           key={'month'}
           options={MONTH}
           onSelected={onSelectedDwropDown}

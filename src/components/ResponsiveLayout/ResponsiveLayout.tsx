@@ -1,9 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import styles from './ResponsiveLayout.module.css'
-import { useRouter } from 'next/navigation'
-import DropDown from '../DropDown/DropDown'
 
 interface ResponsiveLayoutProps {
   children: React.ReactNode

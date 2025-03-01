@@ -11,7 +11,7 @@ const SettingPageHeader = () => {
         onClick={() => {
           router.back()
         }}
-        className={styles.menuButton}
+        className={styles.menu_button}
       >
         Назад
       </button>

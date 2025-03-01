@@ -14,7 +14,7 @@ import { JobsData, UserData } from '@/types/firestore-data'
 import CalendarGrid, {
   CalendarGridProps,
 } from '@/components/CalendarGrid/CalendarGrid'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
 import {
   getDaysInMonth,
@@ -31,8 +31,6 @@ const Calendar = () => {
   const [calendarGridProps, setCalendarGridProps] =
     useState<CalendarGridProps>()
   const [isLoading, setIsLoading] = useState(true)
-  const [scheduleName, setScheduleName] = useState('')
-  const router = useRouter()
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -48,7 +46,7 @@ const Calendar = () => {
     month: string,
     usersId: string[]
   ) => {
-    const res = await setNewSchedule({
+    await setNewSchedule({
       newSchedule,
       type,
       id,
@@ -93,8 +91,7 @@ const Calendar = () => {
     jobId: string,
     usersIds: string[],
     year: string,
-    month: string,
-    jobName: string
+    month: string
   ) => {
     try {
       const usersQuery = query(
@@ -161,7 +158,6 @@ const Calendar = () => {
         entityNames: entityNames,
         entityColors: entityColors,
       })
-      setScheduleName(jobName)
     } catch (error) {
       console.log(error)
     } finally {
@@ -180,13 +176,7 @@ const Calendar = () => {
 
       const jobData = docSnapshot.data() as JobsData
 
-      handleJobSchedule(
-        jobId,
-        jobData?.users as string[],
-        year!,
-        month!,
-        jobData?.job_name
-      )
+      handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
     } catch (error) {
       console.log(error)
     }
@@ -232,7 +222,6 @@ const Calendar = () => {
         entityNames: entityNames,
         entityColors: entityColors,
       })
-      setScheduleName(userData.user_name)
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)

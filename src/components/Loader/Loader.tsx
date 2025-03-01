@@ -1,4 +1,5 @@
-// components/Loader.tsx
+'use client'
+
 import React from 'react'
 
 import styles from './Loader.module.css'

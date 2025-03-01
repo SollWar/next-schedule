@@ -29,7 +29,7 @@
   flex: 1;
 }
 
-.menuButton {
+.menu_button {
   background-color: #0070f3;
   color: #fff;
   border: none;
@@ -41,7 +41,7 @@
   cursor: pointer;
 }
 
-.iconButton {
+.icon_button {
   aspect-ratio: 1/1;
   display: flex;
   justify-content: center;

@@ -12,26 +12,25 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import { auth, db } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
 import useUserInit from '@/hooks/useUserInit'
 import { useEffect, useState } from 'react'
 import { JobsData, UserData } from '@/types/firestore-data'
-import { User } from 'firebase/auth'
 
-interface HeaderProps {
-  onNewQueryClicl: (query: string) => void
-  currentScheduleName: string
-  children: React.ReactNode
-}
+// interface HeaderProps {
+//   onNewQueryClicl: (query: string) => void
+//   currentScheduleName: string
+//   children: React.ReactNode
+// }
 
 const Header = () => {
   const { user } = useUserInit()
-  const [userData, setUserData] = useState<UserData>()
+  //const [userData, setUserData] = useState<UserData>()
   const [calendarPageHeaderOptions, setCalendarPageHeaderOptions] =
     useState<CalendarPageHeaderOptions[]>()
 
   const searchParams = useSearchParams()
-  const type = searchParams.get('type')
+  //const type = searchParams.get('type')
   const id = searchParams.get('id')
   const year = searchParams.get('year')
   const month = searchParams.get('month')
@@ -48,7 +47,7 @@ const Header = () => {
 
       const userData = docSnapshot.data() as UserData
 
-      setUserData(userData)
+      //setUserData(userData)
 
       const calendarPageHeaderOptionsList: CalendarPageHeaderOptions[] = []
 
