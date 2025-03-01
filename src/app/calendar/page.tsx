@@ -16,9 +16,16 @@ import CalendarGrid, {
 } from '@/components/CalendarGrid/CalendarGrid'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Loader from '@/components/Loader/Loader'
-import { getDaysInMonth, getFirstWeekdayOfMonth } from '@/utils/dateUtils'
+import {
+  getDaysInMonth,
+  getFirstWeekdayOfMonth,
+  MONTH,
+} from '@/utils/dateUtils'
 import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
-import { setNewSchedule } from '@/server/schedule_update/actions'
+import {
+  generateSchedule,
+  setNewSchedule,
+} from '@/server/schedule_update/actions'
 
 const Calendar = () => {
   const [calendarGridProps, setCalendarGridProps] =
@@ -52,7 +59,6 @@ const Calendar = () => {
 
     if (type == 'user') {
       handleUserData(id, year, month)
-      //getJobsName(id)
     } else if (type == 'job') {
       handleJobData(id)
     }
@@ -103,13 +109,32 @@ const Calendar = () => {
         ...(doc.data() as UserData),
       }))
 
-      const monthLength = usersData[0].schedule[year]?.[month].split(',').length
+      const monthLength = getDaysInMonth(
+        Number.parseInt(year),
+        MONTH.indexOf(month)
+      )
+
+      const usersSchedules: string[][] = new Array(usersIds.length).fill(
+        new Array(monthLength)
+      )
+
+      for (let i = 0; i < usersSchedules.length; i++) {
+        if (usersData[i].schedule[year]?.[month]) {
+          usersSchedules[i] = usersData[i].schedule[year]?.[month].split(',')
+        } else {
+          usersSchedules[i] = await generateSchedule(
+            usersData[i].id,
+            year,
+            month
+          )
+        }
+      }
 
       const summarySchedule: string[] = new Array(monthLength).fill(0)
 
       for (let i = 0; i < monthLength; i++) {
         for (let j = 0; j < usersData.length; j++) {
-          if (usersData[j].schedule[year]?.[month].split(',')[i] == jobId) {
+          if (usersSchedules[j][i] == jobId) {
             if (summarySchedule[i] != '0') {
               summarySchedule[i] = 'error'
             } else {
@@ -181,7 +206,9 @@ const Calendar = () => {
         throw new Error('Документ не найден')
       }
       const userData = docSnapshot.data() as UserData
-      const schedule = userData.schedule[year]?.[month]
+      const schedule =
+        userData.schedule[year]?.[month] ??
+        (await generateSchedule(userId, year, month)).join(',')
 
       const entityIds = userData.jobs
 

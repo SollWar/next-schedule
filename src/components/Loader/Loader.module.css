@@ -90,6 +90,14 @@
   animation-delay: 1s;
 }
 
+.card:nth-child(36) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(38) {
+  animation-delay: 1s;
+}
+
 @keyframes loading90 {
   0% {
     background: white;

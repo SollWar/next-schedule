@@ -2,7 +2,7 @@
 export function getDaysInMonth(year: number, month: number): number {
   // Месяцы в JavaScript начинаются с 0 (январь = 0)
   // Создаем дату следующего месяца и отнимаем 1 день
-  return new Date(year, month, 0).getDate()
+  return new Date(year, month + 1, 0).getDate()
 }
 
 /// С какого дня недели начинается месяц

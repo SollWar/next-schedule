@@ -2,6 +2,7 @@
 import admin from 'firebase-admin'
 import { UserData } from '@/types/firestore-data'
 import { WriteResult } from 'firebase-admin/firestore'
+import { getDaysInMonth, MONTH } from '@/utils/dateUtils'
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -109,4 +110,24 @@ export async function setNewSchedule({
   } catch (error) {
     return false
   }
+}
+
+export const generateSchedule = async (
+  id: string,
+  year: string,
+  month: string
+) => {
+  const emptySchedule: string[] = new Array(
+    getDaysInMonth(Number.parseInt(year), MONTH.indexOf(month))
+  ).fill('0')
+
+  const db = admin.firestore()
+  const scheduleRef = db.collection('users').doc(id)
+  const refToUpdate = `schedule.${year}.${month}`
+
+  await scheduleRef.update({
+    [refToUpdate]: emptySchedule.join(','),
+  })
+
+  return emptySchedule
 }
