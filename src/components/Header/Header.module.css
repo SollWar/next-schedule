@@ -12,6 +12,7 @@
 }
 
 .header {
+  padding: 0px 2px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,9 +50,8 @@
   padding: 0px 0px;
 }
 
-.setting_button {
-  margin-top: 4px;
-  height: 3.5rem;
-  width: 100%;
-  text-align: start;
+.header_div {
+  color: black;
+  text-align: center;
+  font-size: 20px;
 }

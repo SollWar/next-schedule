@@ -2,7 +2,11 @@
 import { useRouter } from 'next/navigation'
 import styles from './Header.module.css'
 
-const SettingPageHeader = () => {
+interface SettingPageHeaderProps {
+  userId: string
+}
+
+const SettingPageHeader = ({ userId }: SettingPageHeaderProps) => {
   const router = useRouter()
 
   return (
@@ -15,7 +19,7 @@ const SettingPageHeader = () => {
       >
         Назад
       </button>
-      <div>Настройки</div>
+      <div className={styles.header_div}>ID: {userId}</div>
     </header>
   )
 }

@@ -82,7 +82,7 @@ const Header = () => {
   }, [user])
 
   if (isMainPage) return <></>
-  else if (isSettingsPage) return <SettingPageHeader />
+  else if (isSettingsPage) return <SettingPageHeader userId={user?.uid ?? ''} />
   else if (isCalendarPage)
     return (
       <CalendarPageHeader
