@@ -8,9 +8,20 @@
 }
 
 .dropdownItem {
-  padding: 10px 16px;
+  padding: 10px 8px;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.separator {
+  padding: 0px 8px;
+  font-size: 12px;
+  color: gray;
+  cursor: default;
+}
+
+.separator:focus {
+  outline: none;
 }
 
 .dropdownItem:hover {

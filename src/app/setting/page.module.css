@@ -96,3 +96,10 @@
   max-height: 250px;
   opacity: 1;
 }
+
+.colors_grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}

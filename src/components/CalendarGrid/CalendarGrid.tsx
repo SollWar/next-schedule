@@ -124,7 +124,6 @@ const CalendarGrid = ({
         ))}
         <ScheduleTable schedule={editable ? tempSchedule : schedule} />
       </div>
-
       {editable ? (
         <div className={styles.editable_container}>
           <button

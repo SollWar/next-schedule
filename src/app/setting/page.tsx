@@ -1,25 +1,86 @@
 'use client'
 import { doc, getDoc } from 'firebase/firestore'
 import styles from './page.module.css'
-import { db } from '@/lib/firebase'
+import { auth, db } from '@/lib/firebase'
 import { UserData } from '@/types/firestore-data'
 import { useEffect, useState } from 'react'
+import Modal from 'react-modal'
+import { getContrastTextColor } from '@/utils/colorsUtils'
+import { User } from 'firebase/auth'
+
+Modal.setAppElement('body')
 
 const Setting = () => {
   const [userData, setUserData] = useState<UserData>()
   const [usersShow, setUsersShow] = useState(false)
   const [jobsShow, setJobsShow] = useState(false)
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [user] = useState<User | null>(auth.currentUser)
+
+  const colors: string[] = [
+    '#1B1F3B',
+    '#3B1F1B',
+    '#1B3B1F',
+    '#3B3B1B',
+    '#1B3B3B',
+    '#3B1B3B',
+    '#002B5B',
+    '#5B002B',
+    '#005B2B',
+    '#2B5B00',
+    '#5B5B00',
+    '#5B2B00',
+    '#2B005B',
+    '#400040',
+    '#004040',
+    '#402000',
+    '#200040',
+    '#004020',
+    '#402040',
+    '#0A0A0A',
+    '#E6F7FF',
+    '#FFE6F7',
+    '#F7FFE6',
+    '#FFF7E6',
+    '#E6FFF7',
+    '#F7E6FF',
+    '#D0EBFF',
+    '#FFD0EB',
+    '#EBFFD0',
+    '#FFF0D0',
+    '#D0FFF0',
+    '#F0D0FF',
+    '#FFF0F0',
+    '#F0FFF0',
+    '#F0F0FF',
+    '#FFFFD0',
+    '#D0FFFF',
+    '#FFD0D0',
+    '#E0E0FF',
+    '#FFF8E0',
+  ]
+
+  const openModal = () => {
+    setModalOpen(true)
+  }
+
+  const closeModal = (color: string) => {
+    console.log(color != '' ? color : 'not selected color')
+    setModalOpen(false)
+  }
 
   const toggleUsersShow = () => setUsersShow(!usersShow)
 
   const toggleJobsShow = () => setJobsShow(!jobsShow)
 
   useEffect(() => {
-    getUserData()
-  }, [])
+    if (user) {
+      getUserData(user?.uid as string)
+    }
+  }, [user])
 
-  const getUserData = async () => {
-    const userDocRef = doc(db, 'users', '6376611308')
+  const getUserData = async (userId: string) => {
+    const userDocRef = doc(db, 'users', userId)
     const docSnapshot = await getDoc(userDocRef)
 
     if (!docSnapshot.exists()) {
@@ -36,8 +97,11 @@ const Setting = () => {
           <button className={`${styles.menu_button} ${styles.setting_button}`}>
             Имя <span>{userData?.user_name ?? ''}</span>
           </button>
-          <button className={`${styles.menu_button} ${styles.setting_button}`}>
-            Цвет{' '}
+          <button
+            onClick={openModal}
+            className={`${styles.menu_button} ${styles.setting_button}`}
+          >
+            Цвет
             <div className={styles.color_container}>
               <div
                 style={{
@@ -82,20 +146,66 @@ const Setting = () => {
             </button>
             <div
               style={{
-                maxHeight: `${jobsShow ? 44 * 9 + 10 : 0}px`,
+                maxHeight: `${
+                  jobsShow ? 44 * (userData?.jobs.length as number) + 10 : 0
+                }px`,
                 marginBottom: `${jobsShow ? 4 : 0}px`,
               }}
               className={`${styles.dropdownContent} ${
                 jobsShow ? styles.open : ''
               }`}
             >
-              <div className={styles.user_item}>М7</div>
-              <div className={styles.user_item}>Экстрим</div>
-              <div className={styles.user_item}>Климовск</div>
+              {userData?.jobs.map((job) => (
+                <div className={styles.user_item}>{job}</div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => {
+          closeModal('')
+        }}
+        contentLabel="Пример модального окна"
+        style={{
+          content: {
+            width: '80vw', // Ширина модального окна
+            height: 'fit-content', // Высота модального окна
+            margin: 'auto', // Центрирование по горизонтали
+            borderRadius: '10px', // Закругленные углы
+            padding: '0px',
+          },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Прозрачность фона
+          },
+        }}
+      >
+        <div
+          style={{
+            padding: '16px',
+          }}
+        >
+          <div className={styles.colors_grid}>
+            {colors.map((color) => (
+              <button
+                onClick={() => {
+                  closeModal(color)
+                }}
+                key={color}
+                style={{
+                  background: color,
+                  margin: '2px',
+                  color: getContrastTextColor(color),
+                }}
+                className={styles.color_inside_container}
+              >
+                27
+              </button>
+            ))}
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

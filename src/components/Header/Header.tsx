@@ -52,9 +52,19 @@ const Header = () => {
       const calendarPageHeaderOptionsList: CalendarPageHeaderOptions[] = []
 
       calendarPageHeaderOptionsList.push({
+        id: 'users',
+        name: 'users',
+        type: 'users',
+      })
+      calendarPageHeaderOptionsList.push({
         id: user.uid,
         name: userData.user_name,
         type: 'user',
+      })
+      calendarPageHeaderOptionsList.push({
+        id: 'jobs',
+        name: 'jobs',
+        type: 'jobs',
       })
 
       const q = query(
