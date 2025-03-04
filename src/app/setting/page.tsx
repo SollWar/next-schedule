@@ -7,15 +7,18 @@ import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import { User } from 'firebase/auth'
+import useUserAuth from '@/hooks/useUserAuth'
+import { HexColorPicker } from 'react-colorful'
 
 Modal.setAppElement('body')
 
 const Setting = () => {
   const [userData, setUserData] = useState<UserData>()
+  const [color, setColor] = useState('#aabbcc')
   const [usersShow, setUsersShow] = useState(false)
   const [jobsShow, setJobsShow] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
-  const [user] = useState<User | null>(auth.currentUser)
+  const { user, loading } = useUserAuth()
 
   const colors: string[] = [
     '#1B1F3B',
@@ -61,10 +64,11 @@ const Setting = () => {
   ]
 
   const openModal = () => {
+    setColor(userData?.user_color as string)
     setModalOpen(true)
   }
 
-  const closeModal = (color: string) => {
+  const closeModal = () => {
     console.log(color != '' ? color : 'not selected color')
     setModalOpen(false)
   }
@@ -156,7 +160,9 @@ const Setting = () => {
               }`}
             >
               {userData?.jobs.map((job) => (
-                <div className={styles.user_item}>{job}</div>
+                <div key={job} className={styles.user_item}>
+                  {job}
+                </div>
               ))}
             </div>
           </div>
@@ -164,9 +170,7 @@ const Setting = () => {
       </div>
       <Modal
         isOpen={isModalOpen}
-        onRequestClose={() => {
-          closeModal('')
-        }}
+        onRequestClose={closeModal}
         contentLabel="Пример модального окна"
         style={{
           content: {
@@ -186,23 +190,44 @@ const Setting = () => {
             padding: '16px',
           }}
         >
-          <div className={styles.colors_grid}>
-            {colors.map((color) => (
-              <button
-                onClick={() => {
-                  closeModal(color)
-                }}
-                key={color}
+          <div>
+            <HexColorPicker
+              style={{
+                width: 'auto',
+              }}
+              color={color}
+              onChange={setColor}
+            />
+            <div
+              style={{
+                display: 'flex',
+                marginTop: '16px',
+              }}
+            >
+              <span
                 style={{
-                  background: color,
-                  margin: '2px',
+                  width: '-webkit-fill-available',
+                  padding: '8px',
+                  borderRadius: '10px',
                   color: getContrastTextColor(color),
+                  backgroundColor: color,
+                  textAlign: 'center',
                 }}
-                className={styles.color_inside_container}
+              >
+                {userData?.user_name}
+              </span>
+              <span
+                style={{
+                  padding: '8px',
+                  borderRadius: '10px',
+                  color: getContrastTextColor(color),
+                  backgroundColor: color,
+                  textAlign: 'center',
+                }}
               >
                 27
-              </button>
-            ))}
+              </span>
+            </div>
           </div>
         </div>
       </Modal>
