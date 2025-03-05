@@ -132,3 +132,29 @@ export const generateSchedule = async (
 
   return emptySchedule
 }
+
+export const setUserColor = async (userId: string, newColor: string) => {
+  try {
+    const db = admin.firestore()
+    const scheduleRef = db.collection('users').doc(userId)
+    await scheduleRef.update({
+      user_color: newColor,
+    })
+    return true
+  } finally {
+    return false
+  }
+}
+
+export const setUserName = async (userId: string, newName: string) => {
+  try {
+    const db = admin.firestore()
+    const scheduleRef = db.collection('users').doc(userId)
+    await scheduleRef.update({
+      user_name: newName,
+    })
+    return true
+  } finally {
+    return false
+  }
+}

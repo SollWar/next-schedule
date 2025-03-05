@@ -6,24 +6,30 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MONTH } from '@/utils/dateUtils'
 import useUserInit from '@/hooks/useUserInit'
+import userStore from '@/store/userStore'
 
 export default function Home() {
   const { user, authResult } = useUserInit()
+  const { loading, subscribeToDocument } = userStore()
   const router = useRouter()
 
   useEffect(() => {
-    console.log(authResult)
     if (user?.uid) {
       const year = new Date().getFullYear()
       const month = new Date().getMonth()
 
-      setTimeout(() => {
+      const unsubscribe = subscribeToDocument()
+      if (!loading) {
         router.replace(
           `/calendar?type=user&id=${user.uid}&year=${year}&month=${MONTH[month]}`
         )
-      }, 50)
+
+        return () => {
+          unsubscribe()
+        }
+      }
     }
-  }, [user, router])
+  }, [user, router, loading])
 
   return (
     <div className={styles.main}>

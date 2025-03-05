@@ -1,67 +1,20 @@
 'use client'
-import { doc, getDoc } from 'firebase/firestore'
 import styles from './page.module.css'
-import { auth, db } from '@/lib/firebase'
-import { UserData } from '@/types/firestore-data'
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { getContrastTextColor } from '@/utils/colorsUtils'
-import { User } from 'firebase/auth'
-import useUserAuth from '@/hooks/useUserAuth'
 import { HexColorPicker } from 'react-colorful'
+import { setUserColor } from '@/server/schedule_update/actions'
+import userStore from '@/store/userStore'
 
 Modal.setAppElement('body')
 
 const Setting = () => {
-  const [userData, setUserData] = useState<UserData>()
   const [color, setColor] = useState('#aabbcc')
   const [usersShow, setUsersShow] = useState(false)
   const [jobsShow, setJobsShow] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
-  const { user, loading } = useUserAuth()
-
-  const colors: string[] = [
-    '#1B1F3B',
-    '#3B1F1B',
-    '#1B3B1F',
-    '#3B3B1B',
-    '#1B3B3B',
-    '#3B1B3B',
-    '#002B5B',
-    '#5B002B',
-    '#005B2B',
-    '#2B5B00',
-    '#5B5B00',
-    '#5B2B00',
-    '#2B005B',
-    '#400040',
-    '#004040',
-    '#402000',
-    '#200040',
-    '#004020',
-    '#402040',
-    '#0A0A0A',
-    '#E6F7FF',
-    '#FFE6F7',
-    '#F7FFE6',
-    '#FFF7E6',
-    '#E6FFF7',
-    '#F7E6FF',
-    '#D0EBFF',
-    '#FFD0EB',
-    '#EBFFD0',
-    '#FFF0D0',
-    '#D0FFF0',
-    '#F0D0FF',
-    '#FFF0F0',
-    '#F0FFF0',
-    '#F0F0FF',
-    '#FFFFD0',
-    '#D0FFFF',
-    '#FFD0D0',
-    '#E0E0FF',
-    '#FFF8E0',
-  ]
+  const { userData, uid, loading } = userStore()
 
   const openModal = () => {
     setColor(userData?.user_color as string)
@@ -69,30 +22,17 @@ const Setting = () => {
   }
 
   const closeModal = () => {
-    console.log(color != '' ? color : 'not selected color')
+    setModalOpen(false)
+  }
+
+  const selectColor = async () => {
+    await setUserColor(uid as string, color)
     setModalOpen(false)
   }
 
   const toggleUsersShow = () => setUsersShow(!usersShow)
 
   const toggleJobsShow = () => setJobsShow(!jobsShow)
-
-  useEffect(() => {
-    if (user) {
-      getUserData(user?.uid as string)
-    }
-  }, [user])
-
-  const getUserData = async (userId: string) => {
-    const userDocRef = doc(db, 'users', userId)
-    const docSnapshot = await getDoc(userDocRef)
-
-    if (!docSnapshot.exists()) {
-      throw new Error('Документ не найден')
-    }
-
-    setUserData(docSnapshot.data() as UserData)
-  }
 
   return (
     <div className={styles.container}>
@@ -212,6 +152,7 @@ const Setting = () => {
                   color: getContrastTextColor(color),
                   backgroundColor: color,
                   textAlign: 'center',
+                  marginRight: '8px',
                 }}
               >
                 {userData?.user_name}
@@ -227,6 +168,32 @@ const Setting = () => {
               >
                 27
               </span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: '16px',
+              }}
+            >
+              <button
+                onClick={closeModal}
+                style={{
+                  padding: '6px',
+                }}
+                className={styles.menu_button}
+              >
+                Отмена
+              </button>
+              <button
+                onClick={selectColor}
+                style={{
+                  padding: '6px',
+                }}
+                className={styles.menu_button}
+              >
+                Сохранить
+              </button>
             </div>
           </div>
         </div>

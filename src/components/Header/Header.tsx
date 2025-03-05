@@ -16,6 +16,7 @@ import { db } from '@/lib/firebase'
 import useUserInit from '@/hooks/useUserInit'
 import { useEffect, useState } from 'react'
 import { JobsData, UserData } from '@/types/firestore-data'
+import userStore from '@/store/userStore'
 
 // interface HeaderProps {
 //   onNewQueryClicl: (query: string) => void
@@ -28,6 +29,7 @@ const Header = () => {
   //const [userData, setUserData] = useState<UserData>()
   const [calendarPageHeaderOptions, setCalendarPageHeaderOptions] =
     useState<CalendarPageHeaderOptions[]>()
+  const { userData, uid, loading } = userStore()
 
   const searchParams = useSearchParams()
   //const type = searchParams.get('type')
@@ -89,15 +91,20 @@ const Header = () => {
 
   useEffect(() => {
     getUserData()
+    console.log(userData)
   }, [user])
 
   if (isMainPage) return <></>
-  else if (isSettingsPage) return <SettingPageHeader userId={user?.uid ?? ''} />
+  else if (isSettingsPage) return <SettingPageHeader userId={uid ?? ''} />
   else if (isCalendarPage)
     return (
       <CalendarPageHeader
         id={id ?? ''}
-        options={calendarPageHeaderOptions ?? [{ id: '', name: '', type: '' }]}
+        options={
+          calendarPageHeaderOptions ?? [
+            { id: '', name: userData?.user_name ?? '', type: '' },
+          ]
+        }
         year={year ?? ''}
         month={month ?? ''}
       />
