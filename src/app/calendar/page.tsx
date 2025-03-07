@@ -1,13 +1,4 @@
 'use client'
-import { db } from '@/lib/firebase'
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
 import { JobData, UserData } from '@/types/firestore-data'
@@ -31,11 +22,12 @@ import scheduleStore from '@/store/scheduleStore'
 const Calendar = () => {
   const [calendarGridProps, setCalendarGridProps] =
     useState<CalendarGridProps>()
-  const [isLoading, setIsLoading] = useState(true)
   const userData = scheduleStore((state) => state.userData)
   const jobData = scheduleStore((state) => state.jobData)
   const subscribeToUser = scheduleStore((state) => state.subscribeToUser)
   const subscribeToJob = scheduleStore((state) => state.subscribeToJob)
+  // const unsubscribeToUser = scheduleStore((state) => state.unsubscribeUser)
+  // const unsubscribeToJob = scheduleStore((state) => state.unsubscribeJob)
   const loading = scheduleStore((state) => state.loading)
   const error = scheduleStore((state) => state.error)
 
@@ -62,15 +54,20 @@ const Calendar = () => {
       usersId,
     })
 
-    if (type == 'user') {
-      handleUserData(id, year, month)
-    } else if (type == 'job') {
-      handleJobData(id, year, month)
-    }
+    // if (type == 'user') {
+    //   subscribeToUser(id)
+    // } else if (type == 'job') {
+    //   subscribeToJob(id)
+    // }
   }
 
   const handleChildButtonClick = (newSchedule: string[]) => {
-    setIsLoading(true)
+    // if (type == 'job') {
+    //   unsubscribeToJob!()
+    // }
+    // if (type == 'user') {
+    //   unsubscribeToUser!()
+    // }
     scheduleUpdate(
       newSchedule,
       type ?? '',
@@ -82,7 +79,6 @@ const Calendar = () => {
   }
 
   useEffect(() => {
-    setIsLoading(true)
     if (type == 'user') {
       if (id != null && year != null && month != null) {
         subscribeToUser(id)
@@ -103,17 +99,21 @@ const Calendar = () => {
       } else if (type == 'job') {
         if (id != null && year != null && month != null) {
           handleJobData(id, year, month)
-          console.log('pagepage', 'useEffect', 'Loading')
         }
       }
     }
   }, [loading])
 
+  useEffect(() => {
+    if (error != null) {
+      console.warn(error)
+    }
+  }, [error])
+
   const handleJobData = async (jobId: string, year: string, month: string) => {
     try {
-      console.log('pagepage', 'handleJobData', jobData)
       if (jobData != null) {
-        const currentJobData = jobData as JobData
+        // const currentJobData = jobData as JobData
         const currentUserData = userData as UserData[]
 
         const monthLength = getDaysInMonth(
@@ -152,11 +152,14 @@ const Calendar = () => {
           }
         }
 
-        const entityIds: string[] = currentJobData.users //
+        const entityIds: string[] = []
+
+        //const entityIds: string[] = usersIds //
         const entityNames: string[] = []
         const entityColors: string[] = ['#FFFFFF']
 
         currentUserData.forEach((user) => {
+          entityIds.push(user.id)
           entityNames.push(user.user_name)
           entityColors.push(user.user_color)
         })
@@ -169,34 +172,15 @@ const Calendar = () => {
 
         setCalendarGridProps({
           schedule: summarySchedule,
-          entityIds: currentJobData.users,
+          entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
         })
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      setIsLoading(false)
     }
   }
-
-  // const handleJobData = async (jobId: string) => {
-  //   try {
-  //     const jobDocRef = doc(db, 'jobs', jobId)
-  //     const docSnapshot = await getDoc(jobDocRef)
-
-  //     if (!docSnapshot.exists()) {
-  //       throw new Error('Документ не найден')
-  //     }
-
-  //     const jobData = docSnapshot.data() as JobData
-
-  //     handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
 
   const handleUserData = async (
     userId: string,
@@ -230,8 +214,6 @@ const Calendar = () => {
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -251,13 +233,15 @@ const Calendar = () => {
         days={getDaysInMonth(2025, 2)}
         fakeDays={getFirstWeekdayOfMonth(2025, 1) - 1}
       >
-        <CalendarGrid
-          schedule={calendarGridProps?.schedule ?? []}
-          entityIds={calendarGridProps?.entityIds ?? []}
-          entityNames={calendarGridProps?.entityNames ?? []}
-          entityColors={calendarGridProps?.entityColors ?? []}
-          onAcceptClick={handleChildButtonClick}
-        />
+        {calendarGridProps == undefined ? null : (
+          <CalendarGrid
+            schedule={calendarGridProps.schedule}
+            entityIds={calendarGridProps.entityIds}
+            entityNames={calendarGridProps.entityNames}
+            entityColors={calendarGridProps.entityColors}
+            onAcceptClick={handleChildButtonClick}
+          />
+        )}
       </Loader>
     </ResponsiveLayout>
   )

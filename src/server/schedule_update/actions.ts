@@ -1,7 +1,6 @@
 'use server'
 import admin from 'firebase-admin'
 import { UserData } from '@/types/firestore-data'
-import { WriteResult } from 'firebase-admin/firestore'
 import { getDaysInMonth, MONTH } from '@/utils/dateUtils'
 
 if (!admin.apps.length) {
@@ -39,11 +38,9 @@ export async function setNewSchedule({
       const scheduleRef = db.collection('users').doc(id)
       const refToUpdate = `schedule.${year}.${month}`
 
-      await scheduleRef.update({
+      scheduleRef.update({
         [refToUpdate]: newSchedule.join(','),
       })
-
-      console.log('Field updated successfully')
     } else if (type == 'job') {
       const clearUserIds = usersId.filter((str) => str !== 'error')
 
@@ -59,8 +56,8 @@ export async function setNewSchedule({
 
       // Преобразуем результат в массив объектов
       const usersData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
         ...(doc.data() as UserData),
+        id: doc.id,
       }))
 
       const scheduleForUsers = clearUserIds.map(() =>
@@ -78,6 +75,9 @@ export async function setNewSchedule({
             // Если по новому расписанию этот пользователь должен работать в этот день,
             // назначаем в расписании магазина значение id.
             scheduleForUsers[userIndex][dayIndex] = id
+          } else if (assignedUser === 'error') {
+            scheduleForUsers[userIndex][dayIndex] =
+              currentUserSchedule[userIndex][dayIndex]
           } else {
             // Если в личном расписании пользователя был назначен магазин (id),
             // а новый график его не назначает, то ставим выходной ('0').
@@ -92,21 +92,19 @@ export async function setNewSchedule({
         })
       })
 
-      const forUpdate: Promise<WriteResult>[] = []
+      const batch = db.batch()
 
       scheduleForUsers.forEach(async (schedule, index) => {
-        const scheduleRef = db.collection('users').doc(usersId[index])
-        const refToUpdate = `schedule.${year}.${month}`
-        forUpdate.push(
-          scheduleRef.update({
-            [refToUpdate]: (schedule as string[]).join(','),
-          })
-        )
+        const refToBatch = db.collection('users').doc(usersId[index])
+        const updateString = `schedule.${year}.${month}`
+
+        batch.update(refToBatch, {
+          [updateString]: (schedule as string[]).join(','),
+        })
       })
 
-      await Promise.all(forUpdate)
+      await batch.commit()
     }
-    return true
   } catch (error) {
     console.log(error)
     return false

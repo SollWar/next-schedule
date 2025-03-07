@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { auth, db } from '../lib/firebase'
-import { doc, DocumentData, onSnapshot } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { UserData } from '@/types/firestore-data'
-import { useState } from 'react'
-import { User } from 'firebase/auth'
 
 interface DocumentStoreState {
   userData: UserData | null // Данные документа

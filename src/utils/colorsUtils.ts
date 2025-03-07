@@ -31,10 +31,15 @@ function isLightColor(r: number, g: number, b: number): boolean {
  * @returns Контрастный цвет текста в формате RGB (черный или белый)
  */
 export function getContrastTextColor(backgroundColor: string) {
-  const { r, g, b } = hexToRgb(backgroundColor)
+  try {
+    const { r, g, b } = hexToRgb(backgroundColor)
 
-  // Если цвет светлый, возвращаем черный, иначе — белый
-  return isLightColor(r, g, b) ? 'black' : 'white'
+    // Если цвет светлый, возвращаем черный, иначе — белый
+    return isLightColor(r, g, b) ? 'black' : 'white'
+  } catch (error) {
+    console.warn(error)
+    return 'black'
+  }
 }
 
 /**

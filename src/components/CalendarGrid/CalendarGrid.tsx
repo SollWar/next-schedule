@@ -31,7 +31,7 @@ const CalendarGrid = ({
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
 
   const calculateJobCount = (schedule: string[]) => {
-    const jobCount = new Array(schedule.length).fill(0)
+    const jobCount = new Array(entityNames.length).fill(0)
     schedule.map((day) => {
       entityIds.map((job, index) => {
         if (day == job) {
@@ -41,6 +41,7 @@ const CalendarGrid = ({
         }
       })
     })
+    console.log('grid', 'jobCount', jobCount)
     setJobCounts(jobCount)
   }
 
@@ -58,8 +59,8 @@ const CalendarGrid = ({
   useEffect(() => {
     setTempSchedule(schedule)
     let forDropDonwItems = [...entityNames]
-    if (entityNames.indexOf('error') != -1) {
-      forDropDonwItems = entityNames.filter((entity) => entity !== 'error')
+    if (entityNames.indexOf('Совпадают') != -1) {
+      forDropDonwItems = entityNames.filter((entity) => entity !== 'Совпадают')
     }
     forDropDonwItems.push('Выходной')
     setDropDownItems(forDropDonwItems)
@@ -67,6 +68,10 @@ const CalendarGrid = ({
     setTimeout(() => {
       shangeShow()
     }, 5)
+
+    console.log('grid', schedule)
+    console.log('grid', entityIds)
+    console.log('grid', entityNames)
   }, [schedule, entityIds, entityNames])
 
   const onSelectedDwropDown = (selected: string, selecteIndex: number) => {
@@ -148,7 +153,7 @@ const CalendarGrid = ({
       ) : null}
 
       <div className={styles.job_container}>
-        {entityIds.map((job, index) => (
+        {entityNames.map((job, index) => (
           <div
             key={entityNames[index]}
             className={styles.job_item}

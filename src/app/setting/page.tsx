@@ -1,6 +1,6 @@
 'use client'
 import styles from './page.module.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Modal from 'react-modal'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import { HexColorPicker } from 'react-colorful'

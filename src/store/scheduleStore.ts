@@ -49,7 +49,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
         return
       }
 
-      const jobDataDoc = docSnapshot.data() as JobData
+      const jobDataDoc = (await docSnapshot.data()) as JobData
       const usersQuery = query(
         collection(db, 'users'),
         where('__name__', 'in', jobDataDoc.users)
@@ -58,27 +58,22 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
       // Сохраняем функцию отписки
       const unsubscribe = onSnapshot(usersQuery, async (snapshot) => {
         set({ loading: true })
-        console.log(state.loading)
-        console.log('Вне условия')
 
-        if (snapshot.size === jobDataDoc.users.length) {
-          console.log('В условии')
-          const usersData = snapshot.docs.map((doc) => ({
-            ...(doc.data() as UserData),
-            id: doc.id,
-          }))
+        const usersData = await snapshot.docs.map((doc) => ({
+          ...(doc.data() as UserData),
+          id: doc.id,
+        }))
 
-          set({
-            userData: usersData,
-            jobData: jobDataDoc,
-            loading: false,
-            error: null,
-          })
-        }
+        set({
+          userData: usersData,
+          jobData: jobDataDoc,
+          loading: false,
+          error: null,
+        })
       })
-
       set({ unsubscribeJob: unsubscribe })
     } catch (error) {
+      console.error(error)
       set({ error: 'Error fetching job', loading: false })
     }
   },
@@ -86,11 +81,10 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
   subscribeToUser: async (id) => {
     const state = get()
 
+    set({ loading: true })
     // Отписываемся от предыдущих подписок
     if (state.unsubscribeUser) state.unsubscribeUser()
     if (state.unsubscribeJob) state.unsubscribeJob()
-
-    set({ loading: true, error: null })
 
     try {
       const userRef = doc(db, 'users', id)
@@ -100,7 +94,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
         set({ loading: true })
 
         if (snapshot.exists()) {
-          const userDataSnap = snapshot.data() as UserData
+          const userDataSnap = (await snapshot.data()) as UserData
           const q = query(
             collection(db, 'jobs'),
             where('users', 'array-contains', id)
@@ -110,6 +104,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
           const userJobsDoc = querySnapshot.docs.map(
             (doc) => doc.data() as JobData
           )
+          console.log('value.schedule', userDataSnap.schedule['2025']['Март'])
 
           set({
             userData: userDataSnap,
@@ -124,6 +119,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
 
       set({ unsubscribeUser: unsubscribe })
     } catch (error) {
+      console.error(error)
       set({ error: 'Error fetching user', loading: false })
     }
   },

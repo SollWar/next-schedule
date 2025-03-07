@@ -18,12 +18,6 @@ import { useEffect, useState } from 'react'
 import { JobData, UserData } from '@/types/firestore-data'
 import userStore from '@/store/userStore'
 
-// interface HeaderProps {
-//   onNewQueryClicl: (query: string) => void
-//   currentScheduleName: string
-//   children: React.ReactNode
-// }
-
 const Header = () => {
   const { user } = useUserInit()
   //const [userData, setUserData] = useState<UserData>()
