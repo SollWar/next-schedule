@@ -11,7 +11,7 @@ interface DocumentStoreState {
   loading: boolean // Состояние загрузки
   error: string | null // Ошибка, если есть
   isInitialized: boolean
-  subscribeToDocument: () => () => void // Функция для подписки
+  subscribeToUser: () => () => void // Функция для подписки
 }
 
 const userStore = create<DocumentStoreState>((set) => ({
@@ -22,7 +22,7 @@ const userStore = create<DocumentStoreState>((set) => ({
   isInitialized: false,
 
   // Функция для подписки на обновления документа
-  subscribeToDocument: () => {
+  subscribeToUser: () => {
     console.log('sadasd')
     const documentRef = doc(db, `users/${auth.currentUser?.uid}`)
     // Подписка на обновления документа
@@ -30,6 +30,7 @@ const userStore = create<DocumentStoreState>((set) => ({
       documentRef,
       (snapshot) => {
         if (snapshot.exists()) {
+          console.log(snapshot.data())
           // Если документ существует, обновляем состояние
           set({
             userData: snapshot.data() as UserData,
@@ -45,7 +46,7 @@ const userStore = create<DocumentStoreState>((set) => ({
             uid: null,
             loading: false,
             error: 'Document does not exist',
-            isInitialized: true,
+            isInitialized: false,
           })
         }
       },
@@ -63,7 +64,7 @@ let unsubscribe: () => void
 
 userStore.subscribe((state) => {
   if (!state.isInitialized) {
-    unsubscribe = state.subscribeToDocument()
+    unsubscribe = state.subscribeToUser()
   }
 })
 

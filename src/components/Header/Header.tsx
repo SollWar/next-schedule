@@ -15,7 +15,7 @@ import {
 import { db } from '@/lib/firebase'
 import useUserInit from '@/hooks/useUserInit'
 import { useEffect, useState } from 'react'
-import { JobsData, UserData } from '@/types/firestore-data'
+import { JobData, UserData } from '@/types/firestore-data'
 import userStore from '@/store/userStore'
 
 // interface HeaderProps {
@@ -29,7 +29,16 @@ const Header = () => {
   //const [userData, setUserData] = useState<UserData>()
   const [calendarPageHeaderOptions, setCalendarPageHeaderOptions] =
     useState<CalendarPageHeaderOptions[]>()
-  const { userData, uid, loading } = userStore()
+  const { userData, uid, isInitialized, subscribeToUser } = userStore()
+
+  useEffect(() => {
+    if (isInitialized == false) {
+      const unsubscribe = subscribeToUser()
+      return () => {
+        unsubscribe()
+      }
+    }
+  }, [isInitialized])
 
   const searchParams = useSearchParams()
   //const type = searchParams.get('type')
@@ -75,7 +84,7 @@ const Header = () => {
       )
 
       const querySnapshot = await getDocs(q)
-      const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobsData)
+      const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobData)
 
       for (let i = 0; i < userData.jobs.length; i++) {
         calendarPageHeaderOptionsList.push({

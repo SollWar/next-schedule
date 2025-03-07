@@ -13,26 +13,30 @@ const Setting = () => {
   const [color, setColor] = useState('#aabbcc')
   const [usersShow, setUsersShow] = useState(false)
   const [jobsShow, setJobsShow] = useState(false)
-  const [isModalOpen, setModalOpen] = useState(false)
+  const [colorModalOpen, setCorolModalOpen] = useState(false)
   const { userData, uid, loading } = userStore()
 
   const openModal = () => {
     setColor(userData?.user_color as string)
-    setModalOpen(true)
+    setCorolModalOpen(true)
   }
 
   const closeModal = () => {
-    setModalOpen(false)
+    setCorolModalOpen(false)
   }
 
   const selectColor = async () => {
     await setUserColor(uid as string, color)
-    setModalOpen(false)
+    setCorolModalOpen(false)
   }
 
   const toggleUsersShow = () => setUsersShow(!usersShow)
 
   const toggleJobsShow = () => setJobsShow(!jobsShow)
+
+  if (loading) {
+    return <div className={styles.loader}></div>
+  }
 
   return (
     <div className={styles.container}>
@@ -109,7 +113,7 @@ const Setting = () => {
         </div>
       </div>
       <Modal
-        isOpen={isModalOpen}
+        isOpen={colorModalOpen}
         onRequestClose={closeModal}
         contentLabel="Пример модального окна"
         style={{

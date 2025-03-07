@@ -10,7 +10,7 @@ import userStore from '@/store/userStore'
 
 export default function Home() {
   const { user, authResult } = useUserInit()
-  const { loading, subscribeToDocument } = userStore()
+  const { loading } = userStore()
   const router = useRouter()
 
   useEffect(() => {
@@ -18,16 +18,9 @@ export default function Home() {
       const year = new Date().getFullYear()
       const month = new Date().getMonth()
 
-      const unsubscribe = subscribeToDocument()
-      if (!loading) {
-        router.replace(
-          `/calendar?type=user&id=${user.uid}&year=${year}&month=${MONTH[month]}`
-        )
-
-        return () => {
-          unsubscribe()
-        }
-      }
+      router.replace(
+        `/calendar?type=user&id=${user.uid}&year=${year}&month=${MONTH[month]}`
+      )
     }
   }, [user, router, loading])
 

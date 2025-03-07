@@ -5,13 +5,14 @@ export interface UserSchedule {
 }
 
 export interface UserData {
+  id: string
   user_name: string
   schedule: UserSchedule
   user_color: string
   jobs: string[]
 }
 
-export interface JobsData {
+export interface JobData {
   job_name: string
   job_color: string
   users: string[]

@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
-import { JobsData, UserData } from '@/types/firestore-data'
+import { JobData, UserData } from '@/types/firestore-data'
 import CalendarGrid, {
   CalendarGridProps,
 } from '@/components/CalendarGrid/CalendarGrid'
@@ -26,11 +26,18 @@ import {
   generateSchedule,
   setNewSchedule,
 } from '@/server/schedule_update/actions'
+import scheduleStore from '@/store/scheduleStore'
 
 const Calendar = () => {
   const [calendarGridProps, setCalendarGridProps] =
     useState<CalendarGridProps>()
   const [isLoading, setIsLoading] = useState(true)
+  const userData = scheduleStore((state) => state.userData)
+  const jobData = scheduleStore((state) => state.jobData)
+  const subscribeToUser = scheduleStore((state) => state.subscribeToUser)
+  const subscribeToJob = scheduleStore((state) => state.subscribeToJob)
+  const loading = scheduleStore((state) => state.loading)
+  const error = scheduleStore((state) => state.error)
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -58,7 +65,7 @@ const Calendar = () => {
     if (type == 'user') {
       handleUserData(id, year, month)
     } else if (type == 'job') {
-      handleJobData(id)
+      handleJobData(id, year, month)
     }
   }
 
@@ -78,86 +85,95 @@ const Calendar = () => {
     setIsLoading(true)
     if (type == 'user') {
       if (id != null && year != null && month != null) {
-        handleUserData(id, year, month)
+        subscribeToUser(id)
       }
     } else if (type == 'job') {
       if (id != null && year != null && month != null) {
-        handleJobData(id)
+        subscribeToJob(id)
       }
     }
   }, [type, id, year, month])
 
-  const handleJobSchedule = async (
-    jobId: string,
-    usersIds: string[],
-    year: string,
-    month: string
-  ) => {
-    try {
-      const usersQuery = query(
-        collection(db, 'users'),
-        where('__name__', 'in', usersIds)
-      ) // Firestore позволяет max 30 ID в `in`
-      const querySnapshot = await getDocs(usersQuery)
-
-      const usersData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as UserData),
-      }))
-
-      const monthLength = getDaysInMonth(
-        Number.parseInt(year),
-        MONTH.indexOf(month)
-      )
-
-      const usersSchedules: string[][] = new Array(usersIds.length).fill(
-        new Array(monthLength)
-      )
-
-      for (let i = 0; i < usersSchedules.length; i++) {
-        if (usersData[i].schedule[year]?.[month]) {
-          usersSchedules[i] = usersData[i].schedule[year]?.[month].split(',')
-        } else {
-          usersSchedules[i] = await generateSchedule(
-            usersData[i].id,
-            year,
-            month
-          )
+  useEffect(() => {
+    if (!loading) {
+      if (type == 'user') {
+        if (id != null && year != null && month != null) {
+          handleUserData(id, year, month)
+        }
+      } else if (type == 'job') {
+        if (id != null && year != null && month != null) {
+          handleJobData(id, year, month)
+          console.log('pagepage', 'useEffect', 'Loading')
         }
       }
+    }
+  }, [loading])
 
-      const summarySchedule: string[] = new Array(monthLength).fill(0)
+  const handleJobData = async (jobId: string, year: string, month: string) => {
+    try {
+      console.log('pagepage', 'handleJobData', jobData)
+      if (jobData != null) {
+        const currentJobData = jobData as JobData
+        const currentUserData = userData as UserData[]
 
-      for (let i = 0; i < monthLength; i++) {
-        for (let j = 0; j < usersData.length; j++) {
-          if (usersSchedules[j][i] == jobId) {
-            if (summarySchedule[i] != '0') {
-              summarySchedule[i] = 'error'
-            } else {
-              summarySchedule[i] = usersData[j].id
+        const monthLength = getDaysInMonth(
+          Number.parseInt(year),
+          MONTH.indexOf(month)
+        )
+
+        const usersSchedules: string[][] = new Array(
+          currentUserData.length
+        ).fill(new Array(monthLength))
+
+        for (let i = 0; i < usersSchedules.length; i++) {
+          if (currentUserData[i].schedule[year]?.[month]) {
+            usersSchedules[i] =
+              currentUserData[i].schedule[year]?.[month].split(',')
+          } else {
+            usersSchedules[i] = await generateSchedule(
+              currentUserData[i].id,
+              year,
+              month
+            )
+          }
+        }
+
+        const summarySchedule: string[] = new Array(monthLength).fill(0)
+
+        for (let i = 0; i < monthLength; i++) {
+          for (let j = 0; j < currentUserData.length; j++) {
+            if (usersSchedules[j][i] == jobId) {
+              if (summarySchedule[i] != '0') {
+                summarySchedule[i] = 'error'
+              } else {
+                summarySchedule[i] = currentUserData[j].id
+              }
             }
           }
         }
-      }
 
-      const entityIds: string[] = usersIds
-      const entityNames: string[] = []
-      const entityColors: string[] = ['#FFFFFF']
-      usersData.forEach((user) => {
-        entityNames.push(user.user_name)
-        entityColors.push(user.user_color)
-      })
-      if (summarySchedule.indexOf('error') != -1) {
-        entityColors.push('#ff0000')
-        entityNames.push('Совпадают')
-        entityIds.push('error')
+        const entityIds: string[] = currentJobData.users //
+        const entityNames: string[] = []
+        const entityColors: string[] = ['#FFFFFF']
+
+        currentUserData.forEach((user) => {
+          entityNames.push(user.user_name)
+          entityColors.push(user.user_color)
+        })
+
+        if (summarySchedule.indexOf('error') != -1) {
+          entityColors.push('#ff0000')
+          entityNames.push('Совпадают')
+          entityIds.push('error')
+        }
+
+        setCalendarGridProps({
+          schedule: summarySchedule,
+          entityIds: currentJobData.users,
+          entityNames: entityNames,
+          entityColors: entityColors,
+        })
       }
-      setCalendarGridProps({
-        schedule: summarySchedule,
-        entityIds: usersIds,
-        entityNames: entityNames,
-        entityColors: entityColors,
-      })
     } catch (error) {
       console.log(error)
     } finally {
@@ -165,22 +181,22 @@ const Calendar = () => {
     }
   }
 
-  const handleJobData = async (jobId: string) => {
-    try {
-      const jobDocRef = doc(db, 'jobs', jobId)
-      const docSnapshot = await getDoc(jobDocRef)
+  // const handleJobData = async (jobId: string) => {
+  //   try {
+  //     const jobDocRef = doc(db, 'jobs', jobId)
+  //     const docSnapshot = await getDoc(jobDocRef)
 
-      if (!docSnapshot.exists()) {
-        throw new Error('Документ не найден')
-      }
+  //     if (!docSnapshot.exists()) {
+  //       throw new Error('Документ не найден')
+  //     }
 
-      const jobData = docSnapshot.data() as JobsData
+  //     const jobData = docSnapshot.data() as JobData
 
-      handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  //     handleJobSchedule(jobId, jobData?.users as string[], year!, month!)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   const handleUserData = async (
     userId: string,
@@ -188,40 +204,29 @@ const Calendar = () => {
     month: string
   ) => {
     try {
-      const userDocRef = doc(db, 'users', userId)
-      const docSnapshot = await getDoc(userDocRef)
+      if (userData != null) {
+        const currentUserData: UserData = userData as UserData
+        const currentJobData: JobData[] = jobData as JobData[]
+        const schedule =
+          currentUserData.schedule[year]?.[month] ??
+          (await generateSchedule(userId, year, month)).join(',')
 
-      if (!docSnapshot.exists()) {
-        throw new Error('Документ не найден')
+        const entityIds = currentUserData.jobs
+        const entityNames: string[] = []
+        const entityColors: string[] = ['#FFFFFF']
+
+        currentJobData.forEach((job) => {
+          entityNames.push(job.job_name)
+          entityColors.push(job.job_color)
+        })
+
+        setCalendarGridProps({
+          schedule: schedule.split(','),
+          entityIds: entityIds,
+          entityNames: entityNames,
+          entityColors: entityColors,
+        })
       }
-      const userData = docSnapshot.data() as UserData
-      const schedule =
-        userData.schedule[year]?.[month] ??
-        (await generateSchedule(userId, year, month)).join(',')
-
-      const entityIds = userData.jobs
-
-      const q = query(
-        collection(db, 'jobs'),
-        where('users', 'array-contains', userId)
-      )
-
-      const querySnapshot = await getDocs(q)
-      const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobsData)
-
-      const entityNames: string[] = []
-      const entityColors: string[] = ['#FFFFFF']
-      jobsList.forEach((job) => {
-        entityNames.push(job.job_name)
-        entityColors.push(job.job_color)
-      })
-
-      setCalendarGridProps({
-        schedule: schedule.split(','),
-        entityIds: entityIds,
-        entityNames: entityNames,
-        entityColors: entityColors,
-      })
     } catch (error) {
       console.log(error)
       //setError((error as FirebaseError).message)
@@ -229,33 +234,6 @@ const Calendar = () => {
       setIsLoading(false)
     }
   }
-
-  // const getJobsName = async (userId: string) => {
-  //   try {
-  //     const q = query(
-  //       collection(db, 'jobs'),
-  //       where('users', 'array-contains', userId)
-  //     )
-
-  //     const querySnapshot = await getDocs(q)
-  //     const jobsList = querySnapshot.docs.map((doc) => doc.data() as JobsData)
-
-  //     const entityNames: string[] = []
-  //     const entityColors: string[] = ['#FFFFFF']
-  //     jobsList.forEach((job) => {
-  //       entityNames.push(job.job_name)
-  //       entityColors.push(job.job_color)
-  //     })
-
-  //     setEntityNames(entityNames)
-  //     setEntityColors(entityColors)
-  //   } catch (error) {
-  //     console.log(error)
-  //     //setError((error as FirebaseError).message)
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
 
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
@@ -269,7 +247,7 @@ const Calendar = () => {
         ))}
       </div>
       <Loader
-        isLoading={isLoading}
+        isLoading={loading}
         days={getDaysInMonth(2025, 2)}
         fakeDays={getFirstWeekdayOfMonth(2025, 1) - 1}
       >

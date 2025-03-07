@@ -23,7 +23,7 @@ const CalendarGrid = ({
 }: CalendarGridProps) => {
   const [show, setShow] = useState(false)
   const [editable, setEditable] = useState(false)
-  const [tempSchedule, setTempSchedule] = useState(schedule)
+  const [tempSchedule, setTempSchedule] = useState<string[]>([])
   const [jobCounts, setJobCounts] = useState<number[]>([])
   const [dropDownItems, setDropDownItems] = useState<string[]>([''])
 
@@ -56,6 +56,7 @@ const CalendarGrid = ({
 
   // Почему-то иногда случается двойной вызов
   useEffect(() => {
+    setTempSchedule(schedule)
     let forDropDonwItems = [...entityNames]
     if (entityNames.indexOf('error') != -1) {
       forDropDonwItems = entityNames.filter((entity) => entity !== 'error')
@@ -66,7 +67,7 @@ const CalendarGrid = ({
     setTimeout(() => {
       shangeShow()
     }, 5)
-  }, [])
+  }, [schedule, entityIds, entityNames])
 
   const onSelectedDwropDown = (selected: string, selecteIndex: number) => {
     if (!editable) {
@@ -135,7 +136,10 @@ const CalendarGrid = ({
             Отменить
           </button>
           <button
-            onClick={() => onAcceptClick!(tempSchedule)}
+            onClick={() => {
+              onAcceptClick!(tempSchedule)
+              offEditable()
+            }}
             className={styles.editable_button}
           >
             Применить
