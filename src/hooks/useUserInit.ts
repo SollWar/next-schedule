@@ -26,7 +26,7 @@ const useUserInit = () => {
         await signInWithCustomToken(auth, customToken)
       }
     } catch (error) {
-      console.error(error)
+      console.warn(error)
       setAuthResult('Error')
     }
   }

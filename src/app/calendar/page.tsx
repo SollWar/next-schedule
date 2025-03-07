@@ -12,7 +12,6 @@ import {
   getFirstWeekdayOfMonth,
   MONTH,
 } from '@/utils/dateUtils'
-import ResponsiveLayout from '@/components/ResponsiveLayout/ResponsiveLayout'
 import {
   generateSchedule,
   setNewSchedule,
@@ -53,21 +52,9 @@ const Calendar = () => {
       month,
       usersId,
     })
-
-    // if (type == 'user') {
-    //   subscribeToUser(id)
-    // } else if (type == 'job') {
-    //   subscribeToJob(id)
-    // }
   }
 
   const handleChildButtonClick = (newSchedule: string[]) => {
-    // if (type == 'job') {
-    //   unsubscribeToJob!()
-    // }
-    // if (type == 'user') {
-    //   unsubscribeToUser!()
-    // }
     scheduleUpdate(
       newSchedule,
       type ?? '',
@@ -88,7 +75,7 @@ const Calendar = () => {
         subscribeToJob(id)
       }
     }
-  }, [type, id, year, month])
+  }, [searchParams])
 
   useEffect(() => {
     if (!loading) {
@@ -113,18 +100,20 @@ const Calendar = () => {
   const handleJobData = async (jobId: string, year: string, month: string) => {
     try {
       if (jobData != null) {
-        // const currentJobData = jobData as JobData
         const currentUserData = userData as UserData[]
 
+        // Кол-во дней в месяце для генерации расписания
         const monthLength = getDaysInMonth(
           Number.parseInt(year),
           MONTH.indexOf(month)
         )
 
+        // Расписания для пользователей
         const usersSchedules: string[][] = new Array(
           currentUserData.length
         ).fill(new Array(monthLength))
 
+        // Получает или генерирует расписание
         for (let i = 0; i < usersSchedules.length; i++) {
           if (currentUserData[i].schedule[year]?.[month]) {
             usersSchedules[i] =
@@ -138,11 +127,13 @@ const Calendar = () => {
           }
         }
 
+        // Суммарное расписание
         const summarySchedule: string[] = new Array(monthLength).fill(0)
 
         for (let i = 0; i < monthLength; i++) {
           for (let j = 0; j < currentUserData.length; j++) {
             if (usersSchedules[j][i] == jobId) {
+              // Если расписания совпадают то ошибку в расписание
               if (summarySchedule[i] != '0') {
                 summarySchedule[i] = 'error'
               } else {
@@ -153,8 +144,6 @@ const Calendar = () => {
         }
 
         const entityIds: string[] = []
-
-        //const entityIds: string[] = usersIds //
         const entityNames: string[] = []
         const entityColors: string[] = ['#FFFFFF']
 
@@ -178,7 +167,7 @@ const Calendar = () => {
         })
       }
     } catch (error) {
-      console.log(error)
+      console.warn(error)
     }
   }
 
@@ -212,38 +201,50 @@ const Calendar = () => {
         })
       }
     } catch (error) {
-      console.log(error)
-      //setError((error as FirebaseError).message)
+      console.warn(error)
     }
   }
 
   const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 
   return (
-    <ResponsiveLayout>
-      <div className={styles.grid_container}>
-        {weekDays.map((day, index) => (
-          <div key={index} className={styles.grid_week_days}>
-            {day}
+    <div className={styles.container}>
+      <div className={styles.mainContent}>
+        <div className={styles.content}>
+          {' '}
+          <div className={styles.grid_container}>
+            {weekDays.map((day, index) => (
+              <div key={index} className={styles.grid_week_days}>
+                {day}
+              </div>
+            ))}
           </div>
-        ))}
+          <Loader
+            isLoading={loading}
+            days={getDaysInMonth(
+              Number.parseInt(year ?? '2025'),
+              MONTH.indexOf(month ?? 'Январь')
+            )}
+            fakeDays={
+              getFirstWeekdayOfMonth(
+                Number.parseInt(year ?? '2025'),
+                MONTH.indexOf(month ?? 'Январь')
+              ) - 1
+            }
+          >
+            {calendarGridProps == undefined ? null : (
+              <CalendarGrid
+                schedule={calendarGridProps.schedule}
+                entityIds={calendarGridProps.entityIds}
+                entityNames={calendarGridProps.entityNames}
+                entityColors={calendarGridProps.entityColors}
+                onAcceptClick={handleChildButtonClick}
+              />
+            )}
+          </Loader>{' '}
+        </div>
       </div>
-      <Loader
-        isLoading={loading}
-        days={getDaysInMonth(2025, 2)}
-        fakeDays={getFirstWeekdayOfMonth(2025, 1) - 1}
-      >
-        {calendarGridProps == undefined ? null : (
-          <CalendarGrid
-            schedule={calendarGridProps.schedule}
-            entityIds={calendarGridProps.entityIds}
-            entityNames={calendarGridProps.entityNames}
-            entityColors={calendarGridProps.entityColors}
-            onAcceptClick={handleChildButtonClick}
-          />
-        )}
-      </Loader>
-    </ResponsiveLayout>
+    </div>
   )
 }
 

@@ -27,7 +27,6 @@ const userStore = create<DocumentStoreState>((set) => ({
       documentRef,
       (snapshot) => {
         if (snapshot.exists()) {
-          console.log(snapshot.data())
           // Если документ существует, обновляем состояние
           set({
             userData: snapshot.data() as UserData,

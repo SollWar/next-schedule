@@ -1,6 +1,6 @@
 'use server'
-import { createHmac } from 'crypto'
 import admin from 'firebase-admin'
+import { createHmac } from 'node:crypto'
 
 // Инициализация firebase-admin, если ещё не инициализирована
 if (!admin.apps.length) {

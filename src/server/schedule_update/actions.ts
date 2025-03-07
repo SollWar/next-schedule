@@ -106,7 +106,7 @@ export async function setNewSchedule({
       await batch.commit()
     }
   } catch (error) {
-    console.log(error)
+    console.warn(error)
     return false
   }
 }

@@ -73,7 +73,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
       })
       set({ unsubscribeJob: unsubscribe })
     } catch (error) {
-      console.error(error)
+      console.warn(error)
       set({ error: 'Error fetching job', loading: false })
     }
   },
@@ -104,7 +104,6 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
           const userJobsDoc = querySnapshot.docs.map(
             (doc) => doc.data() as JobData
           )
-          console.log('value.schedule', userDataSnap.schedule['2025']['Март'])
 
           set({
             userData: userDataSnap,
@@ -119,7 +118,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
 
       set({ unsubscribeUser: unsubscribe })
     } catch (error) {
-      console.error(error)
+      console.warn(error)
       set({ error: 'Error fetching user', loading: false })
     }
   },

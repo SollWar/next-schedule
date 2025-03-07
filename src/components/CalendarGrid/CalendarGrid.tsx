@@ -42,7 +42,6 @@ const CalendarGrid = ({
         }
       })
     })
-    console.log('grid', 'jobCount', jobCount)
     setJobCounts(jobCount)
   }
 
@@ -70,10 +69,6 @@ const CalendarGrid = ({
     setTimeout(() => {
       shangeShow()
     }, 5)
-
-    console.log('grid', schedule)
-    console.log('grid', entityIds)
-    console.log('grid', entityNames)
   }, [schedule, entityIds, entityNames])
 
   const onSelectedDwropDown = (selected: string, selecteIndex: number) => {
