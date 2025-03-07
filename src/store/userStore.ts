@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { auth, db } from '../lib/firebase'
+import { db } from '../lib/firebase'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { UserData } from '@/types/firestore-data'
 
@@ -9,7 +9,7 @@ interface DocumentStoreState {
   loading: boolean // Состояние загрузки
   error: string | null // Ошибка, если есть
   isInitialized: boolean
-  subscribeToUser: () => () => void // Функция для подписки
+  subscribeToUser: (uid: string) => void // Функция для подписки
 }
 
 const userStore = create<DocumentStoreState>((set) => ({
@@ -20,9 +20,8 @@ const userStore = create<DocumentStoreState>((set) => ({
   isInitialized: false,
 
   // Функция для подписки на обновления документа
-  subscribeToUser: () => {
-    console.log('sadasd')
-    const documentRef = doc(db, `users/${auth.currentUser?.uid}`)
+  subscribeToUser: (uid) => {
+    const documentRef = doc(db, `users/${uid}`)
     // Подписка на обновления документа
     const unsubscribe = onSnapshot(
       documentRef,
@@ -32,7 +31,7 @@ const userStore = create<DocumentStoreState>((set) => ({
           // Если документ существует, обновляем состояние
           set({
             userData: snapshot.data() as UserData,
-            uid: auth.currentUser?.uid,
+            uid: uid,
             loading: false,
             error: null,
             isInitialized: true,
@@ -57,13 +56,5 @@ const userStore = create<DocumentStoreState>((set) => ({
     return unsubscribe
   },
 }))
-
-let unsubscribe: () => void
-
-userStore.subscribe((state) => {
-  if (!state.isInitialized) {
-    unsubscribe = state.subscribeToUser()
-  }
-})
 
 export default userStore

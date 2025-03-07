@@ -26,6 +26,7 @@ const CalendarGrid = ({
   const [tempSchedule, setTempSchedule] = useState<string[]>([])
   const [jobCounts, setJobCounts] = useState<number[]>([])
   const [dropDownItems, setDropDownItems] = useState<string[]>([''])
+  const [update, setUpdate] = useState<boolean>(false)
 
   const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
   const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
@@ -57,6 +58,7 @@ const CalendarGrid = ({
 
   // Почему-то иногда случается двойной вызов
   useEffect(() => {
+    setUpdate(false)
     setTempSchedule(schedule)
     let forDropDonwItems = [...entityNames]
     if (entityNames.indexOf('Совпадают') != -1) {
@@ -136,6 +138,11 @@ const CalendarGrid = ({
             onClick={() => {
               offEditable()
             }}
+            disabled={update}
+            style={{
+              color: update ? 'gray' : 'black',
+              cursor: update ? 'default' : 'pointer',
+            }}
             className={styles.editable_button}
           >
             Отменить
@@ -143,11 +150,15 @@ const CalendarGrid = ({
           <button
             onClick={() => {
               onAcceptClick!(tempSchedule)
-              offEditable()
+              setUpdate(true)
+            }}
+            disabled={update}
+            style={{
+              cursor: update ? 'default' : 'pointer',
             }}
             className={styles.editable_button}
           >
-            Применить
+            {update ? <div className={styles.loader}></div> : <>Применить</>}
           </button>
         </div>
       ) : null}

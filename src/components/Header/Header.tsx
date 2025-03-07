@@ -4,18 +4,11 @@ import CalendarPageHeader, {
   CalendarPageHeaderOptions,
 } from './CalendarPageHeader'
 import SettingPageHeader from './SettingPageHeader'
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import useUserInit from '@/hooks/useUserInit'
 import { useEffect, useState } from 'react'
-import { JobData, UserData } from '@/types/firestore-data'
+import { JobData } from '@/types/firestore-data'
 import userStore from '@/store/userStore'
 
 const Header = () => {
@@ -23,16 +16,12 @@ const Header = () => {
   //const [userData, setUserData] = useState<UserData>()
   const [calendarPageHeaderOptions, setCalendarPageHeaderOptions] =
     useState<CalendarPageHeaderOptions[]>()
-  const { userData, uid, isInitialized, subscribeToUser } = userStore()
+  const userData = userStore((state) => state.userData)
+  const uid = userStore((state) => state.uid)
+  const isInitialized = userStore((state) => state.isInitialized)
+  const subscribeToUser = userStore((state) => state.subscribeToUser)
 
-  useEffect(() => {
-    if (isInitialized == false) {
-      const unsubscribe = subscribeToUser()
-      return () => {
-        unsubscribe()
-      }
-    }
-  }, [isInitialized])
+  //scheduleStore((state) => state.subscribeToUser)
 
   const searchParams = useSearchParams()
   //const type = searchParams.get('type')
@@ -46,14 +35,7 @@ const Header = () => {
   const isMainPage = pathname.endsWith('/')
 
   const getUserData = async () => {
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid)
-      const docSnapshot = await getDoc(userDocRef)
-
-      const userData = docSnapshot.data() as UserData
-
-      //setUserData(userData)
-
+    if (userData && user) {
       const calendarPageHeaderOptionsList: CalendarPageHeaderOptions[] = []
 
       calendarPageHeaderOptionsList.push({
@@ -93,9 +75,18 @@ const Header = () => {
   }
 
   useEffect(() => {
-    getUserData()
-    console.log(userData)
+    if (user) {
+      if (!isInitialized) {
+        subscribeToUser(user.uid)
+      }
+    }
   }, [user])
+
+  useEffect(() => {
+    if (userData) {
+      getUserData()
+    }
+  }, [userData])
 
   if (isMainPage) return <></>
   else if (isSettingsPage) return <SettingPageHeader userId={uid ?? ''} />
