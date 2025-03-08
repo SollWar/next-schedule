@@ -4,6 +4,7 @@ import styles from './CalendarGrid.module.css'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import { useEffect, useState } from 'react'
 import DropDown from '../DropDown/DropDown'
+import { JobsRules } from '@/types/firestore-data'
 //import { useState } from 'react'
 
 export interface CalendarGridProps {
@@ -11,6 +12,8 @@ export interface CalendarGridProps {
   entityIds: string[]
   entityNames: string[]
   entityColors: string[]
+  fakeDaysNumber: number
+  editableRules: JobsRules
   onAcceptClick?: (newSchedule: string[]) => void
 }
 
@@ -19,6 +22,8 @@ const CalendarGrid = ({
   entityIds,
   entityNames,
   entityColors,
+  fakeDaysNumber,
+  editableRules,
   onAcceptClick,
 }: CalendarGridProps) => {
   const [show, setShow] = useState(false)
@@ -27,9 +32,7 @@ const CalendarGrid = ({
   const [jobCounts, setJobCounts] = useState<number[]>([])
   const [dropDownItems, setDropDownItems] = useState<string[]>([''])
   const [update, setUpdate] = useState<boolean>(false)
-
-  const firstWeekdayOfMonth = getFirstWeekdayOfMonth(2025, 1)
-  const fakeDays = new Array(firstWeekdayOfMonth - 1).fill(0)
+  const [fakeDays, setFakeDays] = useState<number[]>([])
 
   const calculateJobCount = (schedule: string[]) => {
     const jobCount = new Array(entityNames.length).fill(0)
@@ -46,6 +49,7 @@ const CalendarGrid = ({
   }
 
   const shangeShow = () => {
+    console.log(!show)
     setShow(!show)
   }
 
@@ -55,36 +59,44 @@ const CalendarGrid = ({
     calculateJobCount(schedule)
   }
 
-  // Почему-то иногда случается двойной вызов
   useEffect(() => {
+    console.log(schedule)
+    setFakeDays(new Array(fakeDaysNumber - 1).fill(0))
     setUpdate(false)
     setTempSchedule(schedule)
     let forDropDonwItems = [...entityNames]
     if (entityNames.indexOf('Совпадают') != -1) {
       forDropDonwItems = entityNames.filter((entity) => entity !== 'Совпадают')
     }
+    // entityNames.map((value) => {
+    //   if (editableRules[entityNames.indexOf(value) + 1] != '1') {
+    //     forDropDonwItems = entityNames.filter((entity) => entity !== value)
+    //   }
+    // })
     forDropDonwItems.push('Выходной')
     setDropDownItems(forDropDonwItems)
     calculateJobCount(schedule)
     setTimeout(() => {
-      shangeShow()
+      setShow(true)
     }, 5)
   }, [schedule, entityIds, entityNames])
 
   const onSelectedDwropDown = (selected: string, selecteIndex: number) => {
-    if (!editable) {
-      setEditable(true)
+    if (entityIds[entityNames.indexOf(selected)] != schedule[selecteIndex]) {
+      if (!editable) {
+        setEditable(true)
+      }
+
+      const newTempSchedule = tempSchedule.map((item, index) => {
+        if (index !== selecteIndex) return item
+        return selected === 'Выходной'
+          ? 'X'
+          : entityIds[entityNames.indexOf(selected)]
+      })
+
+      setTempSchedule(newTempSchedule)
+      calculateJobCount(newTempSchedule)
     }
-
-    const newTempSchedule = tempSchedule.map((item, index) => {
-      if (index !== selecteIndex) return item
-      return selected === 'Выходной'
-        ? 'X'
-        : entityIds[entityNames.indexOf(selected)]
-    })
-
-    setTempSchedule(newTempSchedule)
-    calculateJobCount(newTempSchedule)
   }
 
   interface ScheduleTableProp {
@@ -97,6 +109,7 @@ const CalendarGrid = ({
         {schedule.map((day, index) => (
           <DropDown
             onSelected={onSelectedDwropDown}
+            // disabled={editableRules[day] === '1' ? false : true}
             className={styles.grid_item}
             options={dropDownItems}
             index={index}

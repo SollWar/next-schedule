@@ -12,6 +12,7 @@ interface DropDownProps {
   index: number
   style: React.CSSProperties
   children: React.ReactNode
+  disabled?: boolean
 }
 
 const DropDown = ({
@@ -20,6 +21,7 @@ const DropDown = ({
   className,
   style,
   onSelected,
+  disabled,
   index,
 }: DropDownProps) => {
   const [visivle] = useState(false)
@@ -27,6 +29,7 @@ const DropDown = ({
     <DropdownMenu.Root>
       {/* Кнопка для открытия меню */}
       <DropdownMenu.Trigger
+        disabled={disabled ?? false}
         className={`${className} ${
           visivle ? styles.dropdownContent_Enable : ''
         }`}

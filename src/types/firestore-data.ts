@@ -9,6 +9,8 @@ export interface UserData {
   user_name: string
   schedule: UserSchedule
   user_color: string
+  jobs_rules: JobsRules
+  permissions: string[]
   jobs: string[]
 }
 
@@ -16,5 +18,8 @@ export interface JobData {
   job_name: string
   job_color: string
   users: string[]
-  users_rules: string[]
+}
+
+export interface JobsRules {
+  [job_id: string]: string
 }

@@ -17,12 +17,16 @@ import {
   setNewSchedule,
 } from '@/server/schedule_update/actions'
 import scheduleStore from '@/store/scheduleStore'
+import userStore from '@/store/userStore'
 
 const Calendar = () => {
   const [calendarGridProps, setCalendarGridProps] =
     useState<CalendarGridProps>()
+  const authUserData = userStore((state) => state.userData)
   const userData = scheduleStore((state) => state.userData)
   const jobData = scheduleStore((state) => state.jobData)
+  const [prevType, setPrevType] = useState<string | null>()
+  const [prevId, setPrevId] = useState<string | null>()
   const subscribeToUser = scheduleStore((state) => state.subscribeToUser)
   const subscribeToJob = scheduleStore((state) => state.subscribeToJob)
   // const unsubscribeToUser = scheduleStore((state) => state.unsubscribeUser)
@@ -66,25 +70,31 @@ const Calendar = () => {
   }
 
   useEffect(() => {
-    if (type == 'user') {
-      if (id != null && year != null && month != null) {
-        subscribeToUser(id)
+    if (id != null && year != null && month != null) {
+      if (type == 'user') {
+        if (prevId === id && prevType === type) {
+          handleUserData(id, year, month)
+        } else {
+          subscribeToUser(id)
+        }
+      } else if (type == 'job') {
+        if (prevId === id && prevType === type) {
+          handleJobData(id, year, month)
+        } else {
+          subscribeToJob(id)
+        }
       }
-    } else if (type == 'job') {
-      if (id != null && year != null && month != null) {
-        subscribeToJob(id)
-      }
+      setPrevType(type)
+      setPrevId(id)
     }
   }, [searchParams])
 
   useEffect(() => {
-    if (!loading) {
-      if (type == 'user') {
-        if (id != null && year != null && month != null) {
+    if (id != null && year != null && month != null) {
+      if (!loading) {
+        if (type == 'user') {
           handleUserData(id, year, month)
-        }
-      } else if (type == 'job') {
-        if (id != null && year != null && month != null) {
+        } else if (type == 'job') {
           handleJobData(id, year, month)
         }
       }
@@ -133,9 +143,9 @@ const Calendar = () => {
         for (let i = 0; i < monthLength; i++) {
           for (let j = 0; j < currentUserData.length; j++) {
             if (usersSchedules[j][i] == jobId) {
-              // Если расписания совпадают то ошибку в расписание
               if (summarySchedule[i] != '0') {
                 summarySchedule[i] = 'error'
+                //summarySchedule[i] += '+' + currentUserData[j].id
               } else {
                 summarySchedule[i] = currentUserData[j].id
               }
@@ -164,6 +174,11 @@ const Calendar = () => {
           entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
+          editableRules: authUserData!.jobs_rules,
+          fakeDaysNumber: getFirstWeekdayOfMonth(
+            Number.parseInt(year),
+            MONTH.indexOf(month)
+          ),
         })
       }
     } catch (error) {
@@ -198,6 +213,11 @@ const Calendar = () => {
           entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
+          editableRules: authUserData!.jobs_rules,
+          fakeDaysNumber: getFirstWeekdayOfMonth(
+            Number.parseInt(year),
+            MONTH.indexOf(month)
+          ),
         })
       }
     } catch (error) {
@@ -238,6 +258,8 @@ const Calendar = () => {
                 entityIds={calendarGridProps.entityIds}
                 entityNames={calendarGridProps.entityNames}
                 entityColors={calendarGridProps.entityColors}
+                editableRules={calendarGridProps.editableRules}
+                fakeDaysNumber={calendarGridProps.fakeDaysNumber}
                 onAcceptClick={handleChildButtonClick}
               />
             )}
