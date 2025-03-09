@@ -1,33 +1,51 @@
 'use client'
 import styles from './page.module.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
-import { getContrastTextColor } from '@/utils/colorsUtils'
-import { HexColorPicker } from 'react-colorful'
-import { setUserColor } from '@/server/schedule_update/actions'
+import { setUserColor, setUserName } from '@/server/schedule_update/actions'
 import userStore from '@/store/userStore'
+import ModalColorPicker from '@/components/Modal/ModalColorPicker/ModalColorPicker'
+import ModalSetUserName from '@/components/Modal/ModalSetUserName/ModalSetUserName'
+import useAllUsers from '@/hooks/useAllUsers'
+import useAllJobs from '@/hooks/useAllJobs'
+import { useRouter } from 'next/navigation'
 
 Modal.setAppElement('body')
 
 const Setting = () => {
-  const [color, setColor] = useState('#aabbcc')
   const [usersShow, setUsersShow] = useState(false)
   const [jobsShow, setJobsShow] = useState(false)
   const [colorModalOpen, setCorolModalOpen] = useState(false)
+  const [nameModalOpen, setNameModalOpen] = useState(false)
+  const { loading: usersLoading, error: userError, users } = useAllUsers()
+  const { loading: jobsLoading, error: jobsError, jobs } = useAllJobs()
   const { userData, uid, loading } = userStore()
+  const router = useRouter()
 
-  const openModal = () => {
-    setColor(userData?.user_color as string)
+  const openColorModal = () => {
     setCorolModalOpen(true)
   }
 
-  const closeModal = () => {
+  const openNameModal = () => {
+    setNameModalOpen(true)
+  }
+
+  const colorCloseModal = () => {
     setCorolModalOpen(false)
   }
 
-  const selectColor = async () => {
+  const nameCloseModal = () => {
+    setNameModalOpen(false)
+  }
+
+  const selectColor = async (color: string) => {
     await setUserColor(uid as string, color)
     setCorolModalOpen(false)
+  }
+
+  const setNewName = async (name: string) => {
+    await setUserName(uid as string, name)
+    setNameModalOpen(false)
   }
 
   const toggleUsersShow = () => setUsersShow(!usersShow)
@@ -42,11 +60,14 @@ const Setting = () => {
     <div className={styles.container}>
       <div className={styles.main_content}>
         <div className={styles.content}>
-          <button className={`${styles.menu_button} ${styles.setting_button}`}>
+          <button
+            onClick={openNameModal}
+            className={`${styles.menu_button} ${styles.setting_button}`}
+          >
             Имя <span>{userData?.user_name ?? ''}</span>
           </button>
           <button
-            onClick={openModal}
+            onClick={openColorModal}
             className={`${styles.menu_button} ${styles.setting_button}`}
           >
             Цвет
@@ -59,149 +80,109 @@ const Setting = () => {
               ></div>
             </div>
           </button>
-          <button className={`${styles.menu_button} ${styles.setting_button}`}>
-            Запросы
-          </button>
+          {userData?.permissions.indexOf('admin') != -1 ? (
+            <>
+              <button
+                className={`${styles.menu_button} ${styles.setting_button}`}
+              >
+                Запросы
+              </button>
 
-          <div className={styles.dropdown}>
-            <button
-              onClick={toggleUsersShow}
-              className={`${styles.menu_button} ${styles.setting_button}`}
-            >
-              Сотрудники
-            </button>
-            <div
-              style={{
-                maxHeight: `${usersShow ? 44 * 4 + 10 : 0}px`,
-                marginBottom: `${usersShow ? 4 : 0}px`,
-              }}
-              className={`${styles.dropdownContent} ${
-                usersShow ? styles.open : ''
-              }`}
-            >
-              <div className={styles.user_item}>Никита</div>
-              <div className={styles.user_item}>Дима</div>
-              <div className={styles.user_item}>Иван</div>
-              <div className={styles.user_item}>Даниил</div>
-            </div>
-          </div>
-          <div className={styles.dropdown}>
-            <button
-              onClick={toggleJobsShow}
-              className={`${styles.menu_button} ${styles.setting_button}`}
-            >
-              Магазины
-            </button>
-            <div
-              style={{
-                maxHeight: `${
-                  jobsShow ? 44 * (userData?.jobs.length as number) + 10 : 0
-                }px`,
-                marginBottom: `${jobsShow ? 4 : 0}px`,
-              }}
-              className={`${styles.dropdownContent} ${
-                jobsShow ? styles.open : ''
-              }`}
-            >
-              {userData?.jobs.map((job) => (
-                <div key={job} className={styles.user_item}>
-                  {job}
+              <div className={styles.dropdown}>
+                <button
+                  onClick={toggleUsersShow}
+                  className={`${styles.menu_button} ${styles.setting_button}`}
+                >
+                  Сотрудники
+                </button>
+                <div
+                  style={{
+                    maxHeight: `${
+                      usersShow ? 44 * ((users?.length as number) + 1) + 10 : 0
+                    }px`,
+                    marginBottom: `${usersShow ? 4 : 0}px`,
+                  }}
+                  className={`${styles.dropdownContent} ${
+                    usersShow ? styles.open : ''
+                  }`}
+                >
+                  {users?.map((user) => (
+                    <button
+                      onClick={() => {
+                        router.push(`/setting/${user.id}`)
+                      }}
+                      key={user.user_name}
+                      className={styles.user_item}
+                    >
+                      {user.user_name}
+                    </button>
+                  ))}
+                  <button
+                    style={{
+                      justifyContent: 'flex-end',
+                      background: 'white',
+                      border: '#0070f3 solid 1px',
+                      color: '#0070f3',
+                    }}
+                    className={styles.user_item}
+                  >
+                    Создать
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+              <div className={styles.dropdown}>
+                <button
+                  onClick={toggleJobsShow}
+                  className={`${styles.menu_button} ${styles.setting_button}`}
+                >
+                  Магазины
+                </button>
+                <div
+                  style={{
+                    maxHeight: `${
+                      jobsShow ? 44 * ((jobs?.length as number) + 1) + 10 : 0
+                    }px`,
+                    marginBottom: `${jobsShow ? 4 : 0}px`,
+                  }}
+                  className={`${styles.dropdownContent} ${
+                    jobsShow ? styles.open : ''
+                  }`}
+                >
+                  {jobs?.map((job) => (
+                    <button key={job.job_name} className={styles.user_item}>
+                      {job.job_name}
+                    </button>
+                  ))}
+                  <button
+                    style={{
+                      justifyContent: 'flex-end',
+                      background: 'white',
+                      border: '#0070f3 solid 1px',
+                      color: '#0070f3',
+                    }}
+                    className={styles.user_item}
+                  >
+                    Создать
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
-      <Modal
-        isOpen={colorModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Пример модального окна"
-        style={{
-          content: {
-            width: '80vw', // Ширина модального окна
-            height: 'fit-content', // Высота модального окна
-            margin: 'auto', // Центрирование по горизонтали
-            borderRadius: '10px', // Закругленные углы
-            padding: '0px',
-          },
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Прозрачность фона
-          },
-        }}
-      >
-        <div
-          style={{
-            padding: '16px',
-          }}
-        >
-          <div>
-            <HexColorPicker
-              style={{
-                width: 'auto',
-              }}
-              color={color}
-              onChange={setColor}
-            />
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '16px',
-              }}
-            >
-              <span
-                style={{
-                  width: '-webkit-fill-available',
-                  padding: '8px',
-                  borderRadius: '10px',
-                  color: getContrastTextColor(color),
-                  backgroundColor: color,
-                  textAlign: 'center',
-                  marginRight: '8px',
-                }}
-              >
-                {userData?.user_name}
-              </span>
-              <span
-                style={{
-                  padding: '8px',
-                  borderRadius: '10px',
-                  color: getContrastTextColor(color),
-                  backgroundColor: color,
-                  textAlign: 'center',
-                }}
-              >
-                27
-              </span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: '16px',
-              }}
-            >
-              <button
-                onClick={closeModal}
-                style={{
-                  padding: '6px',
-                }}
-                className={styles.menu_button}
-              >
-                Отмена
-              </button>
-              <button
-                onClick={selectColor}
-                style={{
-                  padding: '6px',
-                }}
-                className={styles.menu_button}
-              >
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <ModalColorPicker
+        colorModalOpen={colorModalOpen}
+        colorCloseModal={colorCloseModal}
+        userName={userData?.user_name as string}
+        selectColor={selectColor}
+        initColor={userData?.user_color as string}
+      />
+      <ModalSetUserName
+        nameModalOpen={nameModalOpen}
+        nameCloseModal={nameCloseModal}
+        initName={userData?.user_name as string}
+        setNewName={setNewName}
+      />
     </div>
   )
 }

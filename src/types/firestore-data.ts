@@ -15,11 +15,12 @@ export interface UserData {
 }
 
 export interface JobData {
+  id: string
   job_name: string
   job_color: string
   users: string[]
 }
 
 export interface JobsRules {
-  [job_id: string]: string
+  [job_id: string]: '0' | '1'
 }

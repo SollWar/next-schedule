@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
-import { JobData, UserData } from '@/types/firestore-data'
+import { JobData, JobsRules, UserData } from '@/types/firestore-data'
 import CalendarGrid, {
   CalendarGridProps,
 } from '@/components/CalendarGrid/CalendarGrid'
 import { useSearchParams } from 'next/navigation'
-import Loader from '@/components/Loader/Loader'
+import Loader from '@/components/Share/Loader/Loader'
 import {
   getDaysInMonth,
   getFirstWeekdayOfMonth,
@@ -169,12 +169,19 @@ const Calendar = () => {
           entityIds.push('error')
         }
 
+        const editableRules: boolean =
+          authUserData!.permissions.indexOf('admin') != -1
+            ? false
+            : authUserData!.jobs_rules[jobId] === '0'
+            ? true
+            : false
+
         setCalendarGridProps({
           schedule: summarySchedule,
           entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
-          editableRules: authUserData!.jobs_rules,
+          editableRules: editableRules,
           fakeDaysNumber: getFirstWeekdayOfMonth(
             Number.parseInt(year),
             MONTH.indexOf(month)
@@ -194,7 +201,15 @@ const Calendar = () => {
     try {
       if (userData != null) {
         const currentUserData: UserData = userData as UserData
-        const currentJobData: JobData[] = jobData as JobData[]
+        const currentJobData: JobData[] = (jobData as JobData[]).sort(
+          (a, b) => {
+            return (
+              currentUserData.jobs.indexOf(a.id) -
+              currentUserData.jobs.indexOf(b.id)
+            )
+          }
+        )
+
         const schedule =
           currentUserData.schedule[year]?.[month] ??
           (await generateSchedule(userId, year, month)).join(',')
@@ -208,12 +223,22 @@ const Calendar = () => {
           entityColors.push(job.job_color)
         })
 
+        // const editableRules: JobsRules | boolean =
+        //   authUserData!.permissions.indexOf('admin') != -1
+        //     ? false
+        //     : authUserData!.jobs_rules
+
+        const editableRules: JobsRules | boolean =
+          currentUserData!.permissions.indexOf('admin') != -1
+            ? false
+            : currentUserData!.jobs_rules
+
         setCalendarGridProps({
           schedule: schedule.split(','),
           entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
-          editableRules: authUserData!.jobs_rules,
+          editableRules: editableRules,
           fakeDaysNumber: getFirstWeekdayOfMonth(
             Number.parseInt(year),
             MONTH.indexOf(month)
@@ -231,7 +256,6 @@ const Calendar = () => {
     <div className={styles.container}>
       <div className={styles.mainContent}>
         <div className={styles.content}>
-          {' '}
           <div className={styles.grid_container}>
             {weekDays.map((day, index) => (
               <div key={index} className={styles.grid_week_days}>

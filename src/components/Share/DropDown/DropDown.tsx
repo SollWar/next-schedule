@@ -38,31 +38,36 @@ const DropDown = ({
         {children}
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className={styles.dropdownContent} align="start">
-          {options.map((option) => (
-            <DropdownMenu.Item
-              key={option}
-              className={
-                option == 'users' || option == 'jobs'
-                  ? styles.separator
-                  : styles.dropdownItem
-              }
-              onSelect={() =>
-                option == 'users' || option == 'jobs'
-                  ? null
-                  : onSelected(option, index)
-              }
-            >
-              {option == 'users' ? (
-                <div>Сотрудники</div>
-              ) : option == 'jobs' ? (
-                <div>Магазины</div>
-              ) : (
-                option
-              )}
-            </DropdownMenu.Item>
-          ))}
-        </DropdownMenu.Content>
+        {options.length > 0 ? (
+          <DropdownMenu.Content
+            className={styles.dropdownContent}
+            align="start"
+          >
+            {options.map((option) => (
+              <DropdownMenu.Item
+                key={option}
+                className={
+                  option == 'users' || option == 'jobs'
+                    ? styles.separator
+                    : styles.dropdownItem
+                }
+                onSelect={() =>
+                  option == 'users' || option == 'jobs'
+                    ? null
+                    : onSelected(option, index)
+                }
+              >
+                {option == 'users' ? (
+                  <div>Сотрудники</div>
+                ) : option == 'jobs' ? (
+                  <div>Магазины</div>
+                ) : (
+                  option
+                )}
+              </DropdownMenu.Item>
+            ))}
+          </DropdownMenu.Content>
+        ) : null}
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
   )

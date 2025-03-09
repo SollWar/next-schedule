@@ -49,7 +49,11 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
         return
       }
 
-      const jobDataDoc = (await docSnapshot.data()) as JobData
+      const jobDataDoc = {
+        ...(docSnapshot.data() as JobData),
+        id: docSnapshot.id,
+      }
+
       const usersQuery = query(
         collection(db, 'users'),
         where('__name__', 'in', jobDataDoc.users)
@@ -101,9 +105,10 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
           )
 
           const querySnapshot = await getDocs(q)
-          const userJobsDoc = querySnapshot.docs.map(
-            (doc) => doc.data() as JobData
-          )
+          const userJobsDoc = querySnapshot.docs.map((doc) => ({
+            ...(doc.data() as JobData),
+            id: doc.id,
+          }))
 
           set({
             userData: userDataSnap,

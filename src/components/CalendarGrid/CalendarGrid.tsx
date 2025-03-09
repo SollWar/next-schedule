@@ -3,7 +3,7 @@ import { getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import styles from './CalendarGrid.module.css'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import { useEffect, useState } from 'react'
-import DropDown from '../DropDown/DropDown'
+import DropDown from '../Share/DropDown/DropDown'
 import { JobsRules } from '@/types/firestore-data'
 //import { useState } from 'react'
 
@@ -13,7 +13,7 @@ export interface CalendarGridProps {
   entityNames: string[]
   entityColors: string[]
   fakeDaysNumber: number
-  editableRules: JobsRules
+  editableRules: JobsRules | boolean
   onAcceptClick?: (newSchedule: string[]) => void
 }
 
@@ -48,32 +48,42 @@ const CalendarGrid = ({
     setJobCounts(jobCount)
   }
 
-  const shangeShow = () => {
-    console.log(!show)
-    setShow(!show)
-  }
-
   const offEditable = () => {
     setEditable(false)
     setTempSchedule(schedule)
     calculateJobCount(schedule)
   }
 
+  const getEditableRulesForDay = (day: string) => {
+    if (typeof editableRules == 'boolean') {
+      return editableRules
+    } else {
+      return editableRules[day] === '1'
+        ? true
+        : editableRules[day] == undefined
+        ? true
+        : false
+    }
+  }
+
   useEffect(() => {
-    console.log(schedule)
     setFakeDays(new Array(fakeDaysNumber - 1).fill(0))
     setUpdate(false)
     setTempSchedule(schedule)
-    let forDropDonwItems = [...entityNames]
-    if (entityNames.indexOf('Совпадают') != -1) {
-      forDropDonwItems = entityNames.filter((entity) => entity !== 'Совпадают')
+    let forDropDonwItems: string[] = []
+    console.log(entityNames)
+    console.log(editableRules)
+    if (typeof editableRules != 'boolean') {
+      entityNames.map((value, index) => {
+        console.log(value, editableRules[index + 1])
+        if (editableRules[index + 1] === '1') {
+          forDropDonwItems.push(value)
+        }
+      })
     }
-    // entityNames.map((value) => {
-    //   if (editableRules[entityNames.indexOf(value) + 1] != '1') {
-    //     forDropDonwItems = entityNames.filter((entity) => entity !== value)
-    //   }
-    // })
-    forDropDonwItems.push('Выходной')
+    if (forDropDonwItems.length > 0) {
+      forDropDonwItems.push('Выходной')
+    }
     setDropDownItems(forDropDonwItems)
     calculateJobCount(schedule)
     setTimeout(() => {
@@ -109,7 +119,7 @@ const CalendarGrid = ({
         {schedule.map((day, index) => (
           <DropDown
             onSelected={onSelectedDwropDown}
-            // disabled={editableRules[day] === '1' ? false : true}
+            disabled={!getEditableRulesForDay(day)}
             className={styles.grid_item}
             options={dropDownItems}
             index={index}
