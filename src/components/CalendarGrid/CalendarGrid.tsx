@@ -1,10 +1,8 @@
 'use client'
-import { getFirstWeekdayOfMonth } from '@/utils/dateUtils'
 import styles from './CalendarGrid.module.css'
 import { getContrastTextColor } from '@/utils/colorsUtils'
 import { useEffect, useState } from 'react'
 import DropDown from '../Share/DropDown/DropDown'
-import { JobsRules } from '@/types/firestore-data'
 //import { useState } from 'react'
 
 export interface CalendarGridProps {

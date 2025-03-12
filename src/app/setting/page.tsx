@@ -1,6 +1,6 @@
 'use client'
 import styles from './page.module.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Modal from 'react-modal'
 import { setUserColor, setUserName } from '@/server/schedule_update/actions'
 import userStore from '@/store/userStore'
@@ -17,8 +17,8 @@ const Setting = () => {
   const [jobsShow, setJobsShow] = useState(false)
   const [colorModalOpen, setCorolModalOpen] = useState(false)
   const [nameModalOpen, setNameModalOpen] = useState(false)
-  const { loading: usersLoading, error: userError, users } = useAllUsers()
-  const { loading: jobsLoading, error: jobsError, jobs } = useAllJobs()
+  const { users } = useAllUsers()
+  const { jobs } = useAllJobs()
   const { userData, uid, loading } = userStore()
   const router = useRouter()
 

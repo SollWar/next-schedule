@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
-import { JobData, JobsRules, UserData } from '@/types/firestore-data'
+import { JobData, UserData } from '@/types/firestore-data'
 import CalendarGrid, {
   CalendarGridProps,
 } from '@/components/CalendarGrid/CalendarGrid'

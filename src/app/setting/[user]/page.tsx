@@ -5,7 +5,6 @@ import { doc, getDoc } from 'firebase/firestore'
 import { use, useEffect, useState } from 'react'
 import styles from './page.module.css'
 import ModalColorPicker from '@/components/Modal/ModalColorPicker/ModalColorPicker'
-import { setUserColor } from '@/server/schedule_update/actions'
 import Modal from 'react-modal'
 
 Modal.setAppElement('body')
@@ -24,6 +23,7 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
   }
 
   const selectColor = async (color: string) => {
+    console.log(color)
     //await setUserColor(userData?.id as string, color)
     setCorolModalOpen(false)
   }

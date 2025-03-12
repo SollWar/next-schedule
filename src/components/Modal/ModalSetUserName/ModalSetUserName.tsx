@@ -1,7 +1,5 @@
 'use client'
-import { getContrastTextColor } from '@/utils/colorsUtils'
 import { useEffect, useState } from 'react'
-import { HexColorPicker } from 'react-colorful'
 import Modal from 'react-modal'
 import styles from './ModalSetUserName.module.css'
 

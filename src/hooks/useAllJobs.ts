@@ -1,6 +1,6 @@
 'use client'
 import { db } from '@/lib/firebase'
-import { JobData, UserData } from '@/types/firestore-data'
+import { JobData } from '@/types/firestore-data'
 import { collection, getDocs } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 
