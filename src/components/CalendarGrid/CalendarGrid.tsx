@@ -53,16 +53,21 @@ const CalendarGrid = ({
   }
 
   const getEditableRulesForDay = (day: string) => {
-    if (typeof editableRules == 'boolean') {
-      return editableRules
+    if (entityIds.indexOf(day) !== -1) {
+      if (typeof editableRules == 'boolean') {
+        return editableRules
+      } else {
+        return editableRules[entityIds.indexOf(day)] === '1' ? true : false
+      }
     } else {
-      return editableRules[entityIds.indexOf(day)]
+      return true
     }
   }
 
   useEffect(() => {
     setFakeDays(new Array(fakeDaysNumber - 1).fill(0))
     setUpdate(false)
+    console.log(entityIds.indexOf('2'))
     setTempSchedule(schedule)
     let forDropDonwItems: string[] = []
     if (typeof editableRules != 'boolean') {
