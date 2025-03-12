@@ -13,7 +13,7 @@ export interface CalendarGridProps {
   entityNames: string[]
   entityColors: string[]
   fakeDaysNumber: number
-  editableRules: JobsRules | boolean
+  editableRules: string[] | boolean
   onAcceptClick?: (newSchedule: string[]) => void
 }
 
@@ -58,11 +58,7 @@ const CalendarGrid = ({
     if (typeof editableRules == 'boolean') {
       return editableRules
     } else {
-      return editableRules[day] === '1'
-        ? true
-        : editableRules[day] == undefined
-        ? true
-        : false
+      return editableRules[entityIds.indexOf(day)]
     }
   }
 
@@ -71,19 +67,20 @@ const CalendarGrid = ({
     setUpdate(false)
     setTempSchedule(schedule)
     let forDropDonwItems: string[] = []
-    console.log(entityNames)
-    console.log(editableRules)
     if (typeof editableRules != 'boolean') {
       entityNames.map((value, index) => {
-        console.log(value, editableRules[index + 1])
-        if (editableRules[index + 1] === '1') {
+        if (editableRules[index] === '1') {
           forDropDonwItems.push(value)
         }
       })
+    } else {
+      forDropDonwItems = [...entityNames]
+      forDropDonwItems = forDropDonwItems.filter((str) => str !== 'Совпадают')
     }
     if (forDropDonwItems.length > 0) {
       forDropDonwItems.push('Выходной')
     }
+    console.log(forDropDonwItems)
     setDropDownItems(forDropDonwItems)
     calculateJobCount(schedule)
     setTimeout(() => {

@@ -171,10 +171,10 @@ const Calendar = () => {
 
         const editableRules: boolean =
           authUserData!.permissions.indexOf('admin') != -1
-            ? false
-            : authUserData!.jobs_rules[jobId] === '0'
             ? true
-            : false
+            : authUserData!.jobs_rules[jobId] === '0'
+            ? false
+            : true
 
         setCalendarGridProps({
           schedule: summarySchedule,
@@ -217,28 +217,26 @@ const Calendar = () => {
         const entityIds = currentUserData.jobs
         const entityNames: string[] = []
         const entityColors: string[] = ['#FFFFFF']
+        const entityEditableRules: string[] | boolean =
+          authUserData!.permissions.indexOf('admin') != -1 ? true : []
 
         currentJobData.forEach((job) => {
           entityNames.push(job.job_name)
           entityColors.push(job.job_color)
+          if (typeof entityEditableRules != 'boolean') {
+            entityEditableRules.push(authUserData!.jobs_rules[job.id])
+          }
         })
 
-        // const editableRules: JobsRules | boolean =
-        //   authUserData!.permissions.indexOf('admin') != -1
-        //     ? false
-        //     : authUserData!.jobs_rules
-
-        const editableRules: JobsRules | boolean =
-          currentUserData!.permissions.indexOf('admin') != -1
-            ? false
-            : currentUserData!.jobs_rules
+        console.log(currentJobData)
+        console.log(entityEditableRules)
 
         setCalendarGridProps({
           schedule: schedule.split(','),
           entityIds: entityIds,
           entityNames: entityNames,
           entityColors: entityColors,
-          editableRules: editableRules,
+          editableRules: entityEditableRules,
           fakeDaysNumber: getFirstWeekdayOfMonth(
             Number.parseInt(year),
             MONTH.indexOf(month)
