@@ -6,11 +6,12 @@ import { use, useEffect, useState } from 'react'
 import styles from './page.module.css'
 import ModalColorPicker from '@/components/Modal/ModalColorPicker/ModalColorPicker'
 import Modal from 'react-modal'
+import { setUserColor, setUserName } from '@/server/schedule_update/actions'
 
 Modal.setAppElement('body')
 
 const User = ({ params }: { params: Promise<{ user: string }> }) => {
-  const [userName, setUserName] = useState<string>('')
+  const [newName, setNewUserName] = useState<string>('')
   const [userData, setUserData] = useState<UserData>()
   const [colorModalOpen, setCorolModalOpen] = useState(false)
   const { user } = use(params)
@@ -24,8 +25,15 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
 
   const selectColor = async (color: string) => {
     console.log(color)
-    //await setUserColor(userData?.id as string, color)
+    await setUserColor(userData?.id as string, color)
+    getUserData(user)
     setCorolModalOpen(false)
+  }
+
+  const changeName = async (newName: string) => {
+    console.log(newName)
+    await setUserName(userData?.id as string, newName)
+    getUserData(user)
   }
 
   useEffect(() => {
@@ -53,18 +61,20 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
           <input
             className={`${styles.menu_button} ${styles.setting_button}`}
             type="text"
-            onChange={(e) => setUserName(e.target.value)}
-            value={userName}
+            onChange={(e) => setNewUserName(e.target.value)}
+            value={newName}
             placeholder={userData?.id}
             onSubmit={() => {}}
           />
           <input
             className={`${styles.menu_button} ${styles.setting_button}`}
             type="text"
-            onChange={(e) => setUserName(e.target.value)}
-            value={userName}
+            onChange={(e) => setNewUserName(e.target.value)}
+            value={newName}
             placeholder={userData?.user_name}
-            onSubmit={() => {}}
+            onSubmit={() => {
+              changeName(newName)
+            }}
           />
           <button
             onClick={openColorModal}

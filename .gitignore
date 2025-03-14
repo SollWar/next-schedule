@@ -12,6 +12,8 @@
 
 # firebase
 .env.local
+.env.production
+.env.development
 
 # testing
 /coverage
