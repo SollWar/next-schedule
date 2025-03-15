@@ -22,15 +22,14 @@
   flex: 1;
 }
 
-.menu_button {
-  background-color: white;
-  color: #0070f3;
-  border: 2px solid #0070f3;
+.setting_button,
+.setting_input {
+  background-color: #0070f3;
+  color: #fff;
+  border: none;
   font-size: 20px;
+  padding: 0px 4vw;
   border-radius: 4px;
-}
-
-.setting_button {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,6 +37,19 @@
   height: 2.8rem;
   width: 100%;
   text-align: start;
+}
+
+.setting_input {
+  background-color: white;
+  color: #0070f3;
+  text-indent: 4vw;
+  padding-inline: 0px;
+}
+
+.setting_button {
+  background-color: #0070f3;
+  color: #fff;
+  cursor: pointer;
 }
 
 .color_container {

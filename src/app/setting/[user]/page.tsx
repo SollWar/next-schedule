@@ -58,8 +58,9 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
     <div className={styles.container}>
       <div className={styles.main_content}>
         <div className={styles.content}>
+          <button className={styles.setting_button}>Запросы</button>
           <input
-            className={`${styles.menu_button} ${styles.setting_button}`}
+            className={styles.setting_input}
             type="text"
             onChange={(e) => setNewUserName(e.target.value)}
             value={newName}
@@ -67,7 +68,7 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
             onSubmit={() => {}}
           />
           <input
-            className={`${styles.menu_button} ${styles.setting_button}`}
+            className={styles.setting_input}
             type="text"
             onChange={(e) => setNewUserName(e.target.value)}
             value={newName}
@@ -76,10 +77,7 @@ const User = ({ params }: { params: Promise<{ user: string }> }) => {
               changeName(newName)
             }}
           />
-          <button
-            onClick={openColorModal}
-            className={`${styles.menu_button} ${styles.setting_button}`}
-          >
+          <button onClick={openColorModal} className={styles.setting_button}>
             Цвет
             <div className={styles.color_container}>
               <div
