@@ -53,15 +53,10 @@ const CalendarGrid = ({
   }
 
   const getEditableRulesForDay = (day: string) => {
-    if (entityIds.indexOf(day) !== -1) {
-      if (typeof editableRules == 'boolean') {
-        return editableRules
-      } else {
-        return editableRules[entityIds.indexOf(day)] === '1' ? true : false
-      }
-    } else {
-      return true
-    }
+    if (typeof editableRules === 'boolean') return editableRules
+
+    const index = entityIds.indexOf(day)
+    return index === -1 ? true : editableRules[index] === '1'
   }
 
   useEffect(() => {
