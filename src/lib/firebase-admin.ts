@@ -1,5 +1,6 @@
 import { initializeApp, cert, App, ServiceAccount } from 'firebase-admin/app'
 import { getFirestore, Firestore } from 'firebase-admin/firestore'
+require('dotenv').config()
 
 // Тип для сервисного аккаунта Firebase
 const serviceAccount: ServiceAccount = {

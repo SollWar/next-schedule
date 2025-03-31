@@ -1,6 +1,7 @@
 'use server'
 import admin from 'firebase-admin'
 import { createHmac } from 'node:crypto'
+require('dotenv').config()
 
 // Инициализация firebase-admin, если ещё не инициализирована
 if (!admin.apps.length) {

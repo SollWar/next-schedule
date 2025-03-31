@@ -201,6 +201,7 @@ const Calendar = () => {
     try {
       if (userData != null) {
         const currentUserData: UserData = userData as UserData
+        console.log('jobData: ', jobData)
         const currentJobData: JobData[] = (jobData as JobData[]).sort(
           (a, b) => {
             return (

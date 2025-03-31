@@ -109,6 +109,7 @@ const scheduleStore = create<ScheduleStoreState>((set, get) => ({
             ...(doc.data() as JobData),
             id: doc.id,
           }))
+          console.log('jobData: ', userJobsDoc)
 
           set({
             userData: userDataSnap,

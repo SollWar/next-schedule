@@ -2,6 +2,7 @@
 import admin from 'firebase-admin'
 import { UserData } from '@/types/firestore-data'
 import { getDaysInMonth, MONTH } from '@/utils/dateUtils'
+require('dotenv').config()
 
 if (!admin.apps.length) {
   admin.initializeApp({
